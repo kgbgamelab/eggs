@@ -34,6 +34,17 @@
         @keyframes pulse { to { transform: scale(1.3); } }
         @keyframes float { to { transform: translateY(-15px); } }
 
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+        }
+
+        .lang-select {
+            background: #000; color: var(--sec); font-family: 'VT323', monospace; font-size: 24px;
+            padding: 8px 15px; border: 2px solid var(--main); border-radius: 10px; cursor: pointer;
+            outline: none;
+        }
+        .lang-select:focus { box-shadow: 0 0 15px var(--main); }
+
         .columns-wrapper {
             display: flex; gap: 20px; margin-bottom: 20px; width: 100%;
         }
@@ -51,7 +62,7 @@
         input[type="text"]:focus, textarea:focus { border-color: var(--sec); outline: none; box-shadow: 0 0 20px var(--sec); }
         
         .options-row { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; font-size: 18px; }
-        input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--main); }
+        input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--main); flex-shrink: 0; }
 
         .pub-btn {
             background: linear-gradient(45deg, var(--main), var(--sec)); color: #000; border: none;
@@ -69,24 +80,37 @@
 </head>
 <body>
 
-<h1>🐰 ОХОТА НА ЯЙЦА: РЕДАКТОР 🐰</h1>
+<h1 id="title-main">🐰 ОХОТА НА ЯЙЦА: РЕДАКТОР 🐰</h1>
 
 <div class="container">
-    <label>ФИНАЛЬНОЕ ПОЗДРАВЛЕНИЕ (Английский используется по умолчанию, если не задано):</label>
+    <div class="top-bar">
+        <label id="lbl-end" style="margin:0;">ФИНАЛЬНОЕ ПОЗДРАВЛЕНИЕ:</label>
+        <select id="lang-select" class="lang-select">
+            <option value="ru">Русский</option>
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+            <option value="de">Deutsch</option>
+            <option value="es">Español</option>
+            <option value="it">Italiano</option>
+            <option value="ja">日本語</option>
+            <option value="zh">中文</option>
+        </select>
+    </div>
+    
     <input type="text" id="endMsg" value="ТЫ НАШЕЛ ВСЕ ЯЙЦА! С ПАСХОЙ!" placeholder="Текст победы...">
 
     <div class="columns-wrapper">
         <div class="col">
-            <label>Вопросы</label>
+            <label id="lbl-q">Вопросы</label>
             <textarea id="col-q" placeholder="Каждая строка — один вопрос
 (Для картинки добавьте [http://ссылка.jpg] в текст)"></textarea>
         </div>
         <div class="col">
-            <label>Правильные ответы</label>
+            <label id="lbl-c">Правильные ответы</label>
             <textarea id="col-c" placeholder="Каждая строка — ответ для вопроса слева"></textarea>
         </div>
         <div class="col">
-            <label>Неправильные ответы</label>
+            <label id="lbl-w">Неправильные ответы</label>
             <textarea id="col-w" placeholder="Опционально: неверные ответы через |
 Например: cat | cap | map"></textarea>
         </div>
@@ -94,11 +118,11 @@
 
     <div class="options-row">
         <input type="checkbox" id="opt-steal" checked>
-        <label for="opt-steal" style="font-family: 'Montserrat'; font-size: 16px; margin:0; text-shadow: none;">Брать неверные ответы из правильных других вопросов, если строка пустая</label>
+        <label for="opt-steal" id="lbl-steal" style="font-family: 'Montserrat'; font-size: 16px; margin:0; text-shadow: none; color: white;">Брать неверные ответы из правильных других вопросов, если строка пустая</label>
     </div>
     <div class="options-row">
         <input type="checkbox" id="opt-rand">
-        <label for="opt-rand" style="font-family: 'Montserrat'; font-size: 16px; margin:0; text-shadow: none;">Рандомный порядок вопросов в игре</label>
+        <label for="opt-rand" id="lbl-rand" style="font-family: 'Montserrat'; font-size: 16px; margin:0; text-shadow: none; color: white;">Рандомный порядок вопросов в игре</label>
     </div>
 
     <button id="pubBtn" class="pub-btn" onclick="publish()">ОПУБЛИКОВАТЬ КВЕСТ</button>
@@ -106,11 +130,42 @@
 </div>
 
 <div id="output">
-    <p class="copy-info">СКОПИРУЙТЕ ЭТОТ КОД ДЛЯ ВСТАВКИ (IFRAME):</p>
+    <p class="copy-info" id="lbl-copy">СКОПИРУЙТЕ ЭТОТ КОД ДЛЯ ВСТАВКИ (IFRAME):</p>
     <textarea id="finalCode" rows="4" readonly style="font-size: 16px; color: #0f0; margin-bottom: 0; min-height: 100px;"></textarea>
 </div>
 
 <script>
+    const i18nEditor = {
+        ru: { title: "🐰 ОХОТА НА ЯЙЦА: РЕДАКТОР 🐰", endLbl: "ФИНАЛЬНОЕ ПОЗДРАВЛЕНИЕ:", endPl: "Текст победы...", qLbl: "Вопросы", qPl: "Каждая строка — один вопрос\n(Для картинки добавьте [http://ссылка.jpg] в текст)", cLbl: "Правильные ответы", cPl: "Каждая строка — ответ для вопроса слева", wLbl: "Неправильные ответы", wPl: "Опционально: неверные ответы через |\nНапример: cat | cap | map", stealLbl: "Брать неверные ответы из правильных других вопросов, если строка пустая", randLbl: "Рандомный порядок вопросов в игре", pubBtn: "ОПУБЛИКОВАТЬ КВЕСТ", copy: "СКОПИРУЙТЕ ЭТОТ КОД ДЛЯ ВСТАВКИ (IFRAME):" },
+        en: { title: "🐰 EASTER EGG HUNT: EDITOR 🐰", endLbl: "FINAL CONGRATULATIONS:", endPl: "Victory text...", qLbl: "Questions", qPl: "Each line is one question\n(To add image use [http://link.jpg] in text)", cLbl: "Correct Answers", cPl: "Each line — answer for the question on the left", wLbl: "Wrong Answers", wPl: "Optional: wrong answers separated by |\nExample: cat | cap | map", stealLbl: "Take wrong answers from other correct ones if line is empty", randLbl: "Randomize question order in game", pubBtn: "PUBLISH QUEST", copy: "COPY THIS CODE TO EMBED (IFRAME):" },
+        fr: { title: "🐰 CHASSE AUX OEUFS : ÉDITEUR 🐰", endLbl: "FÉLICITATIONS FINALES :", endPl: "Texte de victoire...", qLbl: "Questions", qPl: "Chaque ligne est une question\n(Pour ajouter une image, utilisez [http://lien.jpg])", cLbl: "Bonnes Réponses", cPl: "Chaque ligne — réponse à la question de gauche", wLbl: "Mauvaises Réponses", wPl: "Optionnel : séparées par |\nExemple : chat | chapeau | carte", stealLbl: "Prendre les mauvaises réponses des autres si vide", randLbl: "Ordre aléatoire des questions", pubBtn: "PUBLIER LA QUÊTE", copy: "COPIEZ CE CODE POUR INTÉGRER (IFRAME) :" },
+        de: { title: "🐰 OSTEREIERSUCHE: EDITOR 🐰", endLbl: "ABSCHLUSS-GLÜCKWUNSCH:", endPl: "Siegestext...", qLbl: "Fragen", qPl: "Jede Zeile ist eine Frage\n(Für Bilder nutze [http://link.jpg])", cLbl: "Richtige Antworten", cPl: "Jede Zeile — Antwort für die linke Frage", wLbl: "Falsche Antworten", wPl: "Optional: getrennt durch |\nBeispiel: Katze | Hut | Karte", stealLbl: "Falsche Antworten von anderen nehmen, wenn leer", randLbl: "Zufällige Fragenreihenfolge", pubBtn: "QUEST VERÖFFENTLICHEN", copy: "KOPIEREN SIE DIESEN CODE ZUM EINBETTEN:" },
+        es: { title: "🐰 BÚSQUEDA DE HUEVOS: EDITOR 🐰", endLbl: "FELICITACIONES FINALES:", endPl: "Texto de victoria...", qLbl: "Preguntas", qPl: "Cada línea es una pregunta\n(Para imagen añade [http://enlace.jpg])", cLbl: "Respuestas Correctas", cPl: "Cada línea — respuesta a la pregunta izquierda", wLbl: "Respuestas Incorrectas", wPl: "Opcional: separadas por |\nEjemplo: gato | gorra | mapa", stealLbl: "Tomar respuestas incorrectas de otras si está vacío", randLbl: "Orden aleatorio de preguntas en el juego", pubBtn: "PUBLICAR MISIÓN", copy: "COPIA ESTE CÓDIGO PARA INSERTAR (IFRAME):" },
+        it: { title: "🐰 CACCIA ALLE UOVA: EDITOR 🐰", endLbl: "CONGRATULAZIONI FINALI:", endPl: "Testo di vittoria...", qLbl: "Domande", qPl: "Ogni riga è una domanda\n(Per l'immagine aggiungi [http://link.jpg])", cLbl: "Risposte Corrette", cPl: "Ogni riga — risposta alla domanda a sinistra", wLbl: "Risposte Sbagliate", wPl: "Opzionale: separate da |\nEsempio: gatto | cappello | mappa", stealLbl: "Prendi risposte sbagliate da altre corrette se vuoto", randLbl: "Ordine casuale delle domande", pubBtn: "PUBBLICA MISSIONE", copy: "COPIA QUESTO CODICE DA INSERIRE (IFRAME):" },
+        ja: { title: "🐰 エッグハント：エディター 🐰", endLbl: "クリアメッセージ:", endPl: "クリア時のテキスト...", qLbl: "質問", qPl: "各行に1つの質問\n（画像を追加するにはテキストに [http://リンク.jpg] を含めます）", cLbl: "正解", cPl: "各行 — 左側の質問の答え", wLbl: "不正解", wPl: "任意: | で区切る\n例: 猫 | 帽子 | 地図", stealLbl: "空の場合は他の正解から不正解を取得する", randLbl: "ゲーム内で質問をランダムに並べ替える", pubBtn: "クエストを公開", copy: "埋め込み用のコードをコピー (IFRAME):" },
+        zh: { title: "🐰 寻找彩蛋：编辑器 🐰", endLbl: "最终祝贺:", endPl: "胜利文本...", qLbl: "问题", qPl: "每行一个问题\n（如需图片，请在文本中添加 [http://链接.jpg]）", cLbl: "正确答案", cPl: "每行 — 左侧问题的答案", wLbl: "错误答案", wPl: "可选：使用 | 分隔\n例如：猫 | 帽子 | 地图", stealLbl: "如果为空，则从其他正确答案中获取错误答案", randLbl: "在游戏中随机排列问题顺序", pubBtn: "发布任务", copy: "复制此代码以嵌入 (IFRAME):" }
+    };
+
+    let selectedLanguage = "ru";
+
+    document.getElementById('lang-select').addEventListener('change', (e) => {
+        selectedLanguage = e.target.value;
+        const t = i18nEditor[selectedLanguage];
+        document.getElementById('title-main').innerText = t.title;
+        document.getElementById('lbl-end').innerText = t.endLbl;
+        document.getElementById('endMsg').placeholder = t.endPl;
+        document.getElementById('lbl-q').innerText = t.qLbl;
+        document.getElementById('col-q').placeholder = t.qPl;
+        document.getElementById('lbl-c').innerText = t.cLbl;
+        document.getElementById('col-c').placeholder = t.cPl;
+        document.getElementById('lbl-w').innerText = t.wLbl;
+        document.getElementById('col-w').placeholder = t.wPl;
+        document.getElementById('lbl-steal').innerText = t.stealLbl;
+        document.getElementById('lbl-rand').innerText = t.randLbl;
+        document.getElementById('pubBtn').innerText = t.pubBtn;
+        document.getElementById('lbl-copy').innerText = t.copy;
+    });
+
     async function publish() {
         const btn = document.getElementById('pubBtn');
         const status = document.getElementById('status');
@@ -171,6 +226,7 @@
         const gameId = 'easter-' + Math.random().toString(36).substr(2, 9);
         const data = {
             endMessage: document.getElementById('endMsg').value,
+            language: selectedLanguage, // Передаем выбранный язык в движок
             eggs: tasks
         };
 
