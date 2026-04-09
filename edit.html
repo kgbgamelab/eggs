@@ -106,7 +106,7 @@
             if(!res.ok) throw new Error("Ошибка сервера");
 
             status.innerText = "ГОТОВО!"; status.style.color = "#00ff00";
-            const url = `https://kgbgamelab.github.io/67/hp/index.html?id=${gameId}`;
+            const url = `https://kgbgamelab.github.io/eggs/index.html?id=${gameId}`;
             document.getElementById('output').style.display = 'block';
             document.getElementById('finalCode').value = `<iframe src="${url}" width="100%" height="100%" style="border:none;" allow="autoplay"></iframe>`;
         } catch(e) {
