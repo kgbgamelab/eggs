@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>EASTER QUEST PUBLISHER</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root { --main: #ffaa00; --sec: #00ffcc; --bg: #0a1015; }
+        body { 
+            background: var(--bg); color: white; font-family: 'Montserrat', sans-serif;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin:0; padding: 20px;
+        }
+        h1 { font-family: 'VT323', monospace; font-size: 60px; color: var(--main); text-shadow: 3px 3px 0 #ff00ff; margin-bottom: 10px; }
+        .container {
+            background: rgba(20, 30, 40, 0.9); border: 3px solid var(--sec); padding: 30px;
+            border-radius: 20px; width: 800px; max-width: 95%; box-shadow: 0 0 50px rgba(0, 255, 204, 0.2);
+        }
+        label { display: block; font-family: 'VT323'; font-size: 28px; color: #fff; margin-bottom: 5px; }
+        input, textarea {
+            width: 100%; background: #000; border: 2px solid #334455; color: #fff; padding: 15px;
+            font-family: 'Montserrat'; font-size: 16px; border-radius: 10px; box-sizing: border-box; margin-bottom: 20px;
+        }
+        input:focus, textarea:focus { border-color: var(--main); outline: none; }
+        .task-block { border: 1px dashed var(--sec); padding: 15px; margin-bottom: 15px; border-radius: 10px; background: rgba(0,0,0,0.5); }
+        .btn { background: var(--sec); color: #000; border: none; padding: 15px 25px; font-size: 20px; font-weight: bold; cursor: pointer; border-radius: 10px; transition: 0.2s; }
+        .btn:hover { transform: scale(1.05); }
+        .btn-pub { background: var(--main); width: 100%; font-size: 30px; margin-top: 20px; font-family: 'VT323'; text-transform: uppercase; }
+        #output { margin-top: 30px; display: none; width: 800px; }
+    </style>
+</head>
+<body>
+
+<h1>🐰 EASTER EGG HUNT PRO 🥚</h1>
+
+<div class="container">
+    <label>ФИНАЛЬНОЕ ПОЗДРАВЛЕНИЕ:</label>
+    <input type="text" id="endMsg" value="Ты нашел все пасхальные яйца! С праздником!" placeholder="Текст при победе...">
+
+    <label>ЗАДАНИЯ ДЛЯ ЯИЦ:</label>
+    <div id="tasks-container"></div>
+    <button class="btn" onclick="addTask()">+ ДОБАВИТЬ ЗАДАНИЕ (ЯЙЦО)</button>
+
+    <button id="pubBtn" class="btn btn-pub" onclick="publish()">ОПУБЛИКОВАТЬ КВЕСТ</button>
+    <div id="status" style="text-align: center; font-family: 'VT323'; font-size: 24px; margin-top: 15px;"></div>
+</div>
+
+<div id="output">
+    <label style="color:var(--main)">ССЫЛКА (IFRAME):</label>
+    <textarea id="finalCode" rows="3" readonly style="color:#0f0;"></textarea>
+</div>
+
+<script>
+    let taskCount = 0;
+
+    function addTask() {
+        taskCount++;
+        const div = document.createElement('div');
+        div.className = 'task-block';
+        div.innerHTML = `
+            <label>Яйцо #${taskCount}</label>
+            <input type="text" class="q-img" placeholder="Ссылка на картинку (опционально)">
+            <input type="text" class="q-text" placeholder="Вопрос / Задание" required>
+            <input type="text" class="q-correct" placeholder="Правильный ответ" required>
+            <input type="text" class="q-wrong" placeholder="Неправильные ответы (через запятую)">
+        `;
+        document.getElementById('tasks-container').appendChild(div);
+    }
+
+    // Добавим одно задание по умолчанию
+    addTask();
+
+    async function publish() {
+        const btn = document.getElementById('pubBtn');
+        const status = document.getElementById('status');
+        
+        const tasks = [];
+        document.querySelectorAll('.task-block').forEach(block => {
+            const q = block.querySelector('.q-text').value.trim();
+            const c = block.querySelector('.q-correct').value.trim();
+            if (q && c) {
+                tasks.push({
+                    img: block.querySelector('.q-img').value.trim(),
+                    question: q,
+                    correct: c,
+                    wrong: block.querySelector('.q-wrong').value.split(',').map(s=>s.trim()).filter(Boolean)
+                });
+            }
+        });
+
+        if (tasks.length === 0) { alert("Добавьте хотя бы одно задание!"); return; }
+
+        btn.disabled = true; status.innerText = "СБОРКА ДАННЫХ..."; status.style.color = "var(--sec)";
+        const gameId = 'easter-' + Math.random().toString(36).substr(2, 9);
+        
+        const data = {
+            endMessage: document.getElementById('endMsg').value,
+            eggs: tasks
+        };
+
+        try {
+            const res = await fetch('https://publisher-server-ihqm.onrender.com/publish', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Publish-Key': 'super-secret-123' },
+                body: JSON.stringify({ id: gameId, folder: 'data', data: data })
+            });
+            if(!res.ok) throw new Error("Ошибка сервера");
+
+            status.innerText = "ГОТОВО!"; status.style.color = "#00ff00";
+            const url = `https://kgbgamelab.github.io/67/hp/index.html?id=${gameId}`;
+            document.getElementById('output').style.display = 'block';
+            document.getElementById('finalCode').value = `<iframe src="${url}" width="100%" height="100%" style="border:none;" allow="autoplay"></iframe>`;
+        } catch(e) {
+            status.innerText = "ОШИБКА: " + e.message; status.style.color = "red";
+        } finally {
+            btn.disabled = false;
+        }
+    }
+</script>
+</body>
+</html>
