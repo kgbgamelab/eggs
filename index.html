@@ -833,3 +833,24 @@ function animate() {
       }
       if(!isQuizActive) { mob.lookAt(mob.position.clone().add(mob.userData.walkDir)); mob.translateZ(1.5 * delta); }
     }
+
+    mob.position.x = Math.max(WORLD_MIN + MOB_WORLD_CLAMP_MARGIN, Math.min(WORLD_MAX - MOB_WORLD_CLAMP_MARGIN, mob.position.x));
+    mob.position.z = Math.max(WORLD_MIN + MOB_WORLD_CLAMP_MARGIN, Math.min(WORLD_MAX - MOB_WORLD_CLAMP_MARGIN, mob.position.z));
+    const p = mob.userData.parts; const w = Math.sin(now * (mob.userData.isAggro ? 15 : 5));
+    if(mob.userData.type !== 'skeleton') { p.armL.rotation.x = w; p.armR.rotation.x = -w; } p.legL.rotation.x = -w; p.legR.rotation.x = w;
+  });
+
+  bonuses.forEach(b => b.rotation.y += 0.02); items.forEach(i => i.rotation.y += 0.02);
+  eggs.forEach(e => { e.rotation.y += 0.02; e.position.y = 0.7 + Math.sin(now * 2 + e.id)*0.2; });
+  for(let i=particles.length-1; i>=0; i--) {
+    const p = particles[i]; p.m.position.add(p.v); p.v.y -= 0.01; if(p.m.position.y < 0) { scene.remove(p.m); particles.splice(i,1); }
+  }
+  renderer.render(scene, camera);
+}
+
+document.body.addEventListener('click', (e) => { if(gameStarted && e.button !== 2 && audioCtx.state === 'suspended') audioCtx.resume(); if(gameStarted && !isDead && !isQuizActive) document.body.requestPointerLock(); });
+
+(async () => { await loadLevelData(); })();
+</script>
+</body>
+</html>
