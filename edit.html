@@ -18,6 +18,7 @@
             font-family: 'VT323', monospace; font-size: 70px; margin-bottom: 20px; 
             text-transform: uppercase; letter-spacing: 5px;
             text-shadow: 4px 4px 0 var(--main), -4px -4px 0 var(--sec);
+            text-align: center;
         }
         
         .container {
@@ -71,14 +72,14 @@
 <h1>🐰 ОХОТА НА ЯЙЦА: РЕДАКТОР 🐰</h1>
 
 <div class="container">
-    <label>ФИНАЛЬНОЕ ПОЗДРАВЛЕНИЕ:</label>
+    <label>ФИНАЛЬНОЕ ПОЗДРАВЛЕНИЕ (Английский используется по умолчанию, если не задано):</label>
     <input type="text" id="endMsg" value="ТЫ НАШЕЛ ВСЕ ЯЙЦА! С ПАСХОЙ!" placeholder="Текст победы...">
 
     <div class="columns-wrapper">
         <div class="col">
             <label>Вопросы</label>
             <textarea id="col-q" placeholder="Каждая строка — один вопрос
-(Для картинки добавьте [http://ссылка] в текст)"></textarea>
+(Для картинки добавьте [http://ссылка.jpg] в текст)"></textarea>
         </div>
         <div class="col">
             <label>Правильные ответы</label>
@@ -129,9 +130,8 @@
             if(!qs[i]) continue;
             
             let qText = qs[i];
-            let cText = cs[i] || "Правильный ответ";
+            let cText = cs[i] || "Correct Answer";
             
-            // Проверка на картинку в вопросе вида [url]
             let imgUrl = "";
             let imgMatch = qText.match(/\[(.*?)\]/);
             if(imgMatch) {
@@ -143,7 +143,6 @@
             if(ws[i]) {
                 wrongArr = ws[i].split('|').map(s=>s.trim()).filter(Boolean);
             } else if (autoSteal) {
-                // Берем 3 случайных правильных ответа от других вопросов
                 let others = allCorrects.filter(c => c !== cText);
                 others.sort(() => 0.5 - Math.random());
                 wrongArr = others.slice(0, 3);
@@ -196,7 +195,7 @@
             status.innerText = "ГОТОВО! ИГРА СОЗДАЁТСЯ...";
             status.style.color = "#00ff00";
 
-            const url = `https://kgbgamelab.github.io/eggs/index.html?id=${gameId}`;
+            const url = `https://kgbgamelab.github.io/67/hp/index.html?id=${gameId}`;
             const iframe = `<iframe src="${url}" width="100%" height="100%" style="border:none; position:fixed; top:0; left:0;" allow="autoplay"></iframe>`;
             
             output.style.display = 'block';
