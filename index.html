@@ -2,19 +2,19 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Easter Egg Hunt Pro</title>
+  <title>Easter Egg Hunt Pro - Ultimate</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   <style>
-    body { margin: 0; overflow: hidden; background: #87CEEB; font-family: 'VT323', monospace; user-select: none; }
+    body { margin: 0; overflow: hidden; background: #00BFFF; font-family: 'VT323', monospace; user-select: none; }
     #hud { position: absolute; width: 100%; height: 100%; pointer-events: none; }
 
-    /* НОВЫЙ UI КВИЗА С ФИДБЕКОМ */
+    /* UI КВИЗА С ФИДБЕКОМ */
     #quiz-ui {
       display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      background: rgba(30, 10, 46, 0.95); border: 6px solid #ffaa00; padding: 40px;
-      text-align: center; border-radius: 20px; box-shadow: 0 0 50px rgba(255, 170, 0, 0.5); 
-      pointer-events: auto; z-index: 1000; width: 500px; color: white;
+      background: rgba(30, 10, 46, 0.98); border: 6px solid #ffaa00; padding: 40px;
+      text-align: center; border-radius: 20px; box-shadow: 0 0 80px rgba(255, 170, 0, 0.6); 
+      pointer-events: auto; z-index: 1000; width: 550px; color: white;
     }
     #quiz-img { max-width: 100%; max-height: 250px; border-radius: 10px; display: none; margin-bottom: 20px; border: 2px solid #55ffff; }
     #quiz-q { font-size: 36px; color: #55ffff; margin-bottom: 25px; text-shadow: 2px 2px 0 #000; }
@@ -27,6 +27,7 @@
     .ans-btn.wrong { background: #ff0000 !important; color: #fff !important; border-color: #ff0000 !important; box-shadow: 0 0 20px #ff0000; }
 
     #egg-counter { position: absolute; top: 20px; right: 30px; font-size: 50px; color: #fff; text-shadow: 4px 4px 0 #ffaa00; }
+    #wood-counter { position: absolute; top: 80px; right: 30px; font-size: 40px; color: #fff; text-shadow: 3px 3px 0 #8B4513; }
 
     #win-screen { 
       display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
@@ -36,13 +37,11 @@
     #win-screen h1 { font-size: 90px; color: #ffaa00; text-shadow: 5px 5px 0 #ff00ff; margin: 0; }
     #win-msg { font-size: 50px; color: #55ffff; margin-top: 20px; text-shadow: 3px 3px 0 #000; max-width: 80%; }
 
-    #bday-card {
-      display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      background: rgba(255, 255, 255, 0.95); border: 8px solid #ff55ff; padding: 40px;
-      text-align: center; border-radius: 20px; box-shadow: 0 0 50px #fff; pointer-events: auto; z-index: 1000;
+    #rabbit-screen { 
+      display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+      flex-direction: column; align-items: center; justify-content: center; 
+      background: rgba(255, 215, 0, 0.9); z-index: 1002; pointer-events: auto; text-align: center;
     }
-    #card-text { font-size: 50px; color: #ff00aa; text-shadow: 2px 2px 0 #000; }
-    .close-btn { margin-top: 20px; padding: 10px 20px; font-family: 'VT323'; font-size: 24px; cursor: pointer; background: #ff55ff; color: white; border: none; }
 
     .float-text {
       position: absolute; color: #ffff55; font-size: 40px; font-weight: bold;
@@ -55,6 +54,10 @@
     #house-status {
       position: absolute; top: 100px; width: 100%; text-align: center;
       font-size: 30px; color: #55ff55; text-shadow: 2px 2px 0 #000; display: none;
+    }
+    #peace-status {
+      position: absolute; top: 140px; width: 100%; text-align: center;
+      font-size: 30px; color: #55ffff; text-shadow: 2px 2px 0 #000; display: none;
     }
 
     #crosshair {
@@ -88,8 +91,7 @@
     .slot.active { border-color: white; background: #a0a0a0; transform: scale(1.1); }
 
     #damage-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: red; opacity: 0; pointer-events: none; transition: opacity 0.1s; }
-    #fire-overlay { position: absolute; bottom: 0; left: 0; width: 100%; height: 40%; background: linear-gradient(transparent, rgba(255, 100, 0, 0.5)); opacity: 0; pointer-events: none; transition: opacity 0.2s; }
-
+    
     #game-over { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; color: white; z-index: 999; background: rgba(50,0,0,0.9); }
     .btn-respawn { font-size: 40px; cursor: pointer; color: #ffff55; text-decoration: underline; margin-top: 20px; }
   </style>
@@ -97,11 +99,12 @@
 <body>
 
 <div id="damage-overlay"></div>
-<div id="fire-overlay"></div>
 
 <div id="hud">
   <div id="egg-counter">🥚 0 / 0</div>
+  <div id="wood-counter">🪵 0</div>
   <div id="house-status">🛡️ В УКРЫТИИ</div>
+  <div id="peace-status">🕊️ ПЕРЕМИРИЕ (5С)</div>
   <div id="crosshair"></div>
   <div id="bottom-ui">
     <div id="xp-info">
@@ -115,7 +118,7 @@
     <div id="hotbar">
       <div class="slot active" id="slot-0">🔫</div>
       <div class="slot" id="slot-1"></div>
-      <div class="slot" id="slot-2"></div>
+      <div class="slot" id="slot-2">🪵</div>
     </div>
   </div>
 </div>
@@ -132,6 +135,12 @@
   <button style="margin-top: 40px; padding: 20px 40px; font-size: 30px; cursor: pointer; font-family: 'VT323'; background: #ffaa00; border: none; border-radius: 10px;" onclick="location.reload()">ИГРАТЬ СНОВА</button>
 </div>
 
+<div id="rabbit-screen">
+  <h1 style="font-size:100px; color:#fff; text-shadow:5px 5px 0 #ff00ff; margin:0;">🌟 ЛЕГЕНДАРНАЯ АЧИВКА! 🌟</h1>
+  <p style="font-size:50px; color:#000; font-weight:bold;">ТЫ ПОЙМАЛ ПАСХАЛЬНОГО КРОЛИКА!</p>
+  <button style="margin-top:30px; padding:20px 40px; font-size:30px; cursor:pointer; background:#ff55ff; color:white; border:none; border-radius:10px; font-family:'VT323';" onclick="document.getElementById('rabbit-screen').style.display='none'; document.body.requestPointerLock();">КРУТО!</button>
+</div>
+
 <div id="game-over">
   <h1 style="font-size: 100px; margin:0; text-shadow: 5px 5px 0 #000; color: #ff5555;">YOU DIED</h1>
   <p class="btn-respawn" onclick="location.reload()">Respawn</p>
@@ -139,16 +148,17 @@
 
 <script>
 let scene, camera, renderer, weaponGroup, flash;
-let score = 0, health = 5, combo = 0;
-let targets = [], particles = [], bonuses = [], items = [], projectiles = [], houses = [], eggs = [];
+let score = 0, health = 5, combo = 0, woodCount = 0;
+let targets = [], particles = [], bonuses = [], items = [], houses = [], eggs = [];
 let move = { fwd: false, bwd: false, left: false, right: false, sprint: false, jump: false };
 let player = { vel: new THREE.Vector3(), onGround: false, height: 1.7, speed: 0 };
 let pitch = 0, yaw = 0;
 let isDead = false, isQuizActive = false;
-let lastDamageTime = 0, stepTimer = 0;
-let swingProgress = 0, isSwinging = false;
+let stepTimer = 0, swingProgress = 0, isSwinging = false;
 let currentWeaponType = 'gun';
 let inventory = ['gun'];
+let peaceTimer = 0; // Таймер перемирия после квиза
+let rabbitObj = null;
 
 const WORLD_SIZE = 300;                
 const WORLD_HALF = WORLD_SIZE * 0.5;   
@@ -156,8 +166,8 @@ const WORLD_MARGIN = 3;
 const WORLD_MIN = -WORLD_HALF + WORLD_MARGIN;
 const WORLD_MAX =  WORLD_HALF - WORLD_MARGIN;
 
-const MOB_HOME_RADIUS = 28;            
-const MOB_PLAYER_MAX_DIST = 70;        
+const MOB_HOME_RADIUS = 30;            
+const MOB_PLAYER_MAX_DIST = 80;        
 const MOB_WORLD_CLAMP_MARGIN = 2.5;    
 
 let levelData = { endMessage: "Ты нашел все яйца!", eggs: [] };
@@ -174,24 +184,21 @@ function getLevelIdFromUrl() {
 async function loadLevelData() {
   const id = getLevelIdFromUrl();
   if (!id) {
-    // Demo data if no ID
     levelData.eggs = [
       { question: "Сколько будет 2+2?", correct: "4", wrong: ["3", "5", "8"], img: "" },
-      { question: "Какого цвета трава?", correct: "Зеленая", wrong: ["Синяя", "Красная"], img: "" }
+      { question: "Какого цвета весенняя трава?", correct: "Зеленая", wrong: ["Синяя", "Красная"], img: "" }
     ];
-    updateEggCounter();
+    updateUI();
     return;
   }
   try {
     const url = `${DATA_BASE_URL}${encodeURIComponent(id)}.json?v=${Date.now()}`;
     const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) throw new Error(`data not found (${res.status})`);
+    if (!res.ok) throw new Error(`data not found`);
     const j = await res.json();
     levelData = j.data || j;
-    updateEggCounter();
-  } catch (e) {
-    console.warn("LEVEL LOAD FAIL:", e);
-  }
+    updateUI();
+  } catch (e) { console.warn("LEVEL LOAD FAIL:", e); }
 }
 
 const clock = new THREE.Clock();
@@ -217,23 +224,23 @@ function playSound(type) {
     src.playbackRate.value = 0.95 + Math.random() * 0.1; g.gain.value = 1.0;
     src.connect(g); src.start(0); src.stop(t + 0.25);
   } else if (type === 'music') {
-    const notes = [261.63, 261.63, 293.66, 261.63, 349.23, 329.63, 261.63, 261.63, 293.66, 261.63, 392.00, 349.23];
-    const durations = [0.2, 0.2, 0.4, 0.4, 0.4, 0.8, 0.2, 0.2, 0.4, 0.4, 0.4, 0.8];
+    // Весенняя веселая мелодия (яркая, быстрая, позитивная)
+    const notes = [523.25, 659.25, 783.99, 1046.50, 1174.66, 1046.50, 987.77, 1046.50, 1318.51, 1567.98];
+    const durations = [0.15, 0.15, 0.15, 0.3, 0.1, 0.1, 0.1, 0.3, 0.2, 0.8];
     let now = t;
     for(let i=0; i<notes.length; i++) {
-      const osc = audioCtx.createOscillator();
-      const noteG = audioCtx.createGain();
+      const osc = audioCtx.createOscillator(); const noteG = audioCtx.createGain();
       osc.connect(noteG); noteG.connect(audioCtx.destination);
-      osc.type = 'square'; osc.frequency.value = notes[i];
-      noteG.gain.setValueAtTime(0.1, now); noteG.gain.exponentialRampToValueAtTime(0.001, now + durations[i]);
+      osc.type = 'triangle'; // Более мягкий и "весенний" звук вместо square
+      osc.frequency.value = notes[i];
+      noteG.gain.setValueAtTime(0.15, now); noteG.gain.exponentialRampToValueAtTime(0.001, now + durations[i]);
       osc.start(now); osc.stop(now + durations[i]); now += durations[i];
     }
   } else {
     const osc = audioCtx.createOscillator(); osc.connect(g);
     if(type === 'shoot') {
       osc.type='sawtooth'; osc.frequency.setValueAtTime(1200, t); osc.frequency.exponentialRampToValueAtTime(100, t + 0.15);
-      g.gain.setValueAtTime(0.2, t); g.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
-      osc.start(); osc.stop(t + 0.15);
+      g.gain.setValueAtTime(0.2, t); g.gain.exponentialRampToValueAtTime(0.01, t + 0.15); osc.start(); osc.stop(t + 0.15);
     } else if(type === 'sword_hit') {
       osc.type='square'; osc.frequency.setValueAtTime(100, t); g.gain.setValueAtTime(0.5, t); g.gain.linearRampToValueAtTime(0, t + 0.1); osc.start(); osc.stop(t + 0.1);
     } else if(type === 'hit') { 
@@ -246,6 +253,8 @@ function playSound(type) {
       osc.type='sine'; osc.frequency.setValueAtTime(400, t); osc.frequency.linearRampToValueAtTime(800, t+0.3); g.gain.setValueAtTime(0.3, t); g.gain.linearRampToValueAtTime(0, t+0.3); osc.start(); osc.stop(t+0.3); 
     } else if(type === 'wrong') {
       osc.type='sawtooth'; osc.frequency.setValueAtTime(150, t); osc.frequency.linearRampToValueAtTime(100, t+0.4); g.gain.setValueAtTime(0.3, t); g.gain.linearRampToValueAtTime(0, t+0.4); osc.start(); osc.stop(t+0.4);
+    } else if(type === 'break') {
+      osc.type='sawtooth'; osc.frequency.setValueAtTime(50, t); g.gain.setValueAtTime(0.8, t); g.gain.exponentialRampToValueAtTime(0.01, t+0.4); osc.start(); osc.stop(t+0.4); 
     }
   }
 }
@@ -254,11 +263,11 @@ function createTexture(type) {
   const canvas = document.createElement('canvas'); canvas.width = 64; canvas.height = 64; const ctx = canvas.getContext('2d');
   const fillNoise = (c) => { ctx.fillStyle = c; ctx.fillRect(0,0,64,64); for(let i=0; i<400; i++) { ctx.fillStyle=`rgba(0,0,0,0.1)`; ctx.fillRect(Math.random()*64,Math.random()*64,4,4); }};
 
-  if(type === 'grass_top') { fillNoise('#7CFC00'); ctx.fillStyle='#32CD32'; for(let i=0;i<50;i++) ctx.fillRect(Math.random()*60,Math.random()*60,4,4); } // Весенняя трава
+  if(type === 'grass_top') { fillNoise('#7CFC00'); ctx.fillStyle='#32CD32'; for(let i=0;i<50;i++) ctx.fillRect(Math.random()*60,Math.random()*60,4,4); } 
   else if (type === 'wood') { ctx.fillStyle='#5c4033'; ctx.fillRect(0,0,64,64); ctx.fillStyle='#4a332a'; for(let i=1;i<4;i++) ctx.fillRect(i*16,0,4,64); }
   else if (type === 'planks') { ctx.fillStyle='#a07040'; ctx.fillRect(0,0,64,64); ctx.fillStyle='#805020'; ctx.fillRect(0,0,64,2); ctx.fillRect(0,20,64,2); ctx.fillRect(0,40,64,2); }
   else if (type === 'face') { fillNoise('#bcaea5'); ctx.fillStyle='#222'; ctx.fillRect(10,20,12,12); ctx.fillRect(42,20,12,12); ctx.fillStyle='#633'; ctx.fillRect(20,45,24,8); }
-  else if (type === 'leaves') { fillNoise('#FFB7C5'); ctx.fillStyle='#FF69B4'; for(let i=0;i<60;i++) ctx.fillRect(Math.random()*60,Math.random()*60,6,6); } // Сакура
+  else if (type === 'leaves') { fillNoise('#FFB7C5'); ctx.fillStyle='#FF69B4'; for(let i=0;i<60;i++) ctx.fillRect(Math.random()*60,Math.random()*60,6,6); } 
   else if (type === 'chest') { ctx.fillStyle='#6d4e34'; ctx.fillRect(0,0,64,64); ctx.fillStyle='#000'; ctx.strokeRect(2,2,60,60); ctx.fillStyle='#FFD700'; ctx.fillRect(28,24,8,12); }
   else if (type === 'skel_body') { ctx.fillStyle='#333'; ctx.fillRect(0,0,64,64); ctx.fillStyle='#ddd'; ctx.fillRect(28, 0, 8, 64); for(let i=10; i<50; i+=10) ctx.fillRect(10, i, 44, 4); }
   else if (type === 'skel_face') { ctx.fillStyle='#ccc'; ctx.fillRect(0,0,64,64); ctx.fillStyle='#111'; ctx.fillRect(10,20,16,14); ctx.fillRect(38,20,16,14); ctx.fillRect(28,40,8,8); ctx.fillStyle='#555'; ctx.fillRect(10,55,44,4); }
@@ -267,8 +276,21 @@ function createTexture(type) {
 }
 const textures = { grass: createTexture('grass_top'), wood: createTexture('wood'), planks: createTexture('planks'), face: createTexture('face'), leaves: createTexture('leaves'), chest: createTexture('chest'), skel_body: createTexture('skel_body'), skel_face: createTexture('skel_face') };
 
+function generateEggTexture(baseColor) {
+  const c = document.createElement('canvas'); c.width=64; c.height=64; const ctx = c.getContext('2d');
+  ctx.fillStyle = baseColor.getStyle(); ctx.fillRect(0,0,64,64);
+  
+  ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  for(let i=0; i<8; i++) { ctx.beginPath(); ctx.arc(Math.random()*64, Math.random()*64, 3+Math.random()*4, 0, Math.PI*2); ctx.fill(); }
+  
+  ctx.fillStyle = 'rgba(0,0,0,0.2)';
+  ctx.fillRect(0, 15, 64, 5); ctx.fillRect(0, 45, 64, 5);
+  
+  const tex = new THREE.CanvasTexture(c); tex.magFilter = THREE.NearestFilter; return tex;
+}
+
 function init() {
-  scene = new THREE.Scene(); scene.background = new THREE.Color(0x87CEFA); scene.fog = new THREE.Fog(0x87CEFA, 20, 80);
+  scene = new THREE.Scene(); scene.background = new THREE.Color(0x00BFFF); scene.fog = new THREE.Fog(0x00BFFF, 20, 100);
   camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 1000); camera.rotation.order = 'YXZ';
   weaponGroup = new THREE.Group(); scene.add(weaponGroup);
 
@@ -276,8 +298,8 @@ function init() {
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   document.body.appendChild(renderer.domElement);
 
-  const ambient = new THREE.AmbientLight(0xffffff, 0.7); scene.add(ambient);
-  const sun = new THREE.DirectionalLight(0xffffff, 0.8); sun.position.set(50, 100, 50); sun.castShadow = true;
+  const ambient = new THREE.AmbientLight(0xffffff, 0.8); scene.add(ambient);
+  const sun = new THREE.DirectionalLight(0xffffff, 1.0); sun.position.set(50, 100, 50); sun.castShadow = true;
   sun.shadow.mapSize.width = 2048; sun.shadow.mapSize.height = 2048; scene.add(sun);
 
   createWorld();
@@ -299,6 +321,7 @@ function init() {
     handleKeys(e.code, false);
   });
   document.addEventListener('mousedown', attack);
+  document.addEventListener('contextmenu', buildBlock);
   document.addEventListener('mousemove', onMouseMove);
   window.addEventListener('resize', () => {
     camera.aspect=window.innerWidth/window.innerHeight;
@@ -314,29 +337,41 @@ function createWorld() {
   floor.material.map.wrapS = floor.material.map.wrapT = THREE.RepeatWrapping; floor.material.map.repeat.set(100, 100);
   scene.add(floor);
 
-  // Цветы
   const colors = [0xff0000, 0xffff00, 0xff00ff, 0xffffff];
   for(let i=0; i<150; i++) {
     const f = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), new THREE.MeshBasicMaterial({color: colors[Math.floor(Math.random()*colors.length)]}));
-    f.position.set(Math.random()*200-100, 0.15, Math.random()*200-100);
-    scene.add(f);
+    f.position.set(Math.random()*200-100, 0.15, Math.random()*200-100); scene.add(f);
   }
 
   createHouse(20, 0, 20); createHouse(-30, 0, -30); createHouse(40, 0, -10);
 
   for(let i=0; i<40; i++) {
     const x = Math.random()*200-100; const z = Math.random()*200-100;
-    let tooClose = false; houses.forEach(h => { if(new THREE.Vector3(x,0,z).distanceTo(h.pos) < 8) tooClose = true; });
+    let tooClose = false; houses.forEach(h => { if(new THREE.Vector3(x,0,z).distanceTo(new THREE.Vector3(h.bounds.minX, 0, h.bounds.minZ)) < 8) tooClose = true; });
     if(!tooClose && (Math.abs(x)>10 || Math.abs(z)>10)) createTree(x, z);
   }
 
   for(let i=0; i<15; i++) {
     const type = Math.random()>0.5?'zombie':'skeleton';
-    const m = createMob(type, type);
-    m.position.set(Math.random()*60-30, 0, Math.random()*60-30);
-    m.userData.home = m.position.clone();
-    scene.add(m); targets.push({obj: m});
+    const m = createMob(type, type); m.position.set(Math.random()*100-50, 0, Math.random()*100-50);
+    m.userData.home = m.position.clone(); scene.add(m); targets.push({obj: m});
   }
+
+  createRabbit();
+}
+
+function createRabbit() {
+  const grp = new THREE.Group();
+  const mat = new THREE.MeshLambertMaterial({color: 0xffffff});
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.6), mat); body.position.y = 0.2;
+  const head = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), mat); head.position.set(0, 0.4, -0.3);
+  const earL = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.4, 0.1), mat); earL.position.set(-0.1, 0.7, -0.3);
+  const earR = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.4, 0.1), mat); earR.position.set(0.1, 0.7, -0.3);
+  grp.add(body, head, earL, earR);
+  grp.userData = { isRabbit: true, vel: new THREE.Vector3(), timer: 0 };
+  grp.position.set(10, 0, 10);
+  scene.add(grp);
+  rabbitObj = grp;
 }
 
 function createHouse(x, y, z) {
@@ -350,11 +385,12 @@ function createHouse(x, y, z) {
   const w4b = new THREE.Mesh(new THREE.BoxGeometry(0.5, 4, 2.5), wallMat); w4b.position.set(3.5,2,2.25); grp.add(w4b);
   const roof = new THREE.Mesh(new THREE.ConeGeometry(6, 3, 4), new THREE.MeshLambertMaterial({color: 0x5a3a22})); roof.position.y = 5.5; roof.rotation.y = Math.PI/4; grp.add(roof);
   grp.position.set(x, y, z); scene.add(grp);
-  houses.push({ mesh: grp, pos: new THREE.Vector3(x, y, z), hp: 15, bounds: { minX: x - 3.8, maxX: x + 3.8, minZ: z - 3.8, maxZ: z + 3.8 } });
+  houses.push({ mesh: grp, hp: 999, bounds: { minX: x - 3.8, maxX: x + 3.8, minZ: z - 3.8, maxZ: z + 3.8 } });
 }
 
 function createTree(x, z) {
   const group = new THREE.Group();
+  group.userData = { isTree: true, hp: 3 };
   const trunk = new THREE.Mesh(new THREE.BoxGeometry(1, 5, 1), new THREE.MeshLambertMaterial({map: textures.wood})); trunk.position.y = 2.5; trunk.castShadow = true;
   const leafGeo = new THREE.BoxGeometry(1, 1, 1); const leafMat = new THREE.MeshLambertMaterial({map: textures.leaves, color: 0xFFB7C5});
   for(let lx=-2; lx<=2; lx++) for(let ly=0; ly<=2; ly++) for(let lz=-2; lz<=2; lz++)
@@ -366,13 +402,11 @@ function spawnEggs(taskDataArray) {
   const geo = new THREE.SphereGeometry(0.6, 16, 16); geo.scale(1, 1.3, 1);
   taskDataArray.forEach(task => {
     const color = new THREE.Color().setHSL(Math.random(), 1, 0.6);
-    const mat = new THREE.MeshStandardMaterial({color: color, roughness: 0.2, emissive: color, emissiveIntensity: 0.3});
+    const mat = new THREE.MeshStandardMaterial({map: generateEggTexture(color), roughness: 0.2, emissive: color, emissiveIntensity: 0.2});
     const mesh = new THREE.Mesh(geo, mat);
     mesh.position.set(Math.random()*100-50, 0.7, Math.random()*100-50);
     mesh.userData = { isEgg: true, task: task, baseColor: color };
-    scene.add(mesh);
-    eggs.push(mesh);
-    
+    scene.add(mesh); eggs.push(mesh);
     const light = new THREE.PointLight(color, 1.5, 5); light.position.y = 1; mesh.add(light);
   });
 }
@@ -427,9 +461,8 @@ function createMob(text, type) {
   mob.userData = { 
     parts: {armL, armR, legL, legR, body, head}, 
     isAggro: false, aggroTimer: 0, type: type || 'zombie', 
-    hp: 3, // ✅ У мобов 3 ХП
-    walkTimer: Math.random() * 2, walkDir: new THREE.Vector3(Math.random()-0.5, 0, Math.random()-0.5).normalize(),
-    home: null
+    hp: 3, 
+    walkTimer: Math.random() * 2, walkDir: new THREE.Vector3(Math.random()-0.5, 0, Math.random()-0.5).normalize(), home: null
   };
   return mob;
 }
@@ -449,20 +482,33 @@ function healPlayer() {
   if(health < 5) {
     health++;
     const hearts = document.querySelectorAll('.heart');
-    for(let i=0; i<hearts.length; i++) {
-      if(hearts[i].classList.contains('lost')) { hearts[i].classList.remove('lost'); break; }
-    }
+    for(let i=0; i<hearts.length; i++) { if(hearts[i].classList.contains('lost')) { hearts[i].classList.remove('lost'); break; } }
     playSound('heal');
   }
 }
 
-function attack() {
+function buildBlock(e) {
+  e.preventDefault();
+  if(isDead || isQuizActive || woodCount <= 0) return;
+  const ray = new THREE.Raycaster(); ray.setFromCamera(new THREE.Vector2(0,0), camera);
+  const hits = ray.intersectObjects(scene.children, true);
+  if(hits.length > 0 && hits[0].distance < 10) {
+    const pt = hits[0].point.clone().add(hits[0].face.normal.clone().multiplyScalar(0.5));
+    pt.x = Math.round(pt.x); pt.y = Math.round(pt.y); pt.z = Math.round(pt.z);
+    if(pt.y < 0.5) pt.y = 0.5;
+    const block = new THREE.Mesh(new THREE.BoxGeometry(1,1,1), new THREE.MeshLambertMaterial({map: textures.planks}));
+    block.position.copy(pt); scene.add(block);
+    houses.push({ hp: 5, bounds: { minX: pt.x-0.5, maxX: pt.x+0.5, minZ: pt.z-0.5, maxZ: pt.z+0.5 } });
+    woodCount--; updateUI(); playSound('step');
+  }
+}
+
+function attack(e) {
+  if(e.button === 2) return; // Right click is build
   if(isDead || isSwinging || isQuizActive) return;
   isSwinging = true; swingProgress = 0;
-  if(currentWeaponType === 'gun') {
-    playSound('shoot');
-    if(flash) { flash.intensity = 2; setTimeout(()=>flash.intensity=0, 50); }
-  } else playSound('sword_hit');
+  if(currentWeaponType === 'gun') { playSound('shoot'); if(flash) { flash.intensity = 2; setTimeout(()=>flash.intensity=0, 50); } } 
+  else playSound('sword_hit');
 
   const ray = new THREE.Raycaster(); ray.setFromCamera(new THREE.Vector2(0,0), camera);
   const hits = ray.intersectObjects(scene.children, true);
@@ -472,35 +518,45 @@ function attack() {
     
     if(hit.userData.isEgg) { openQuiz(hit); return; }
 
-    let root = hit; while(root.parent && root.parent.type !== 'Scene') root = root.parent;
+    let root = hit; while(root.parent && root.parent.type !== 'Scene' && !targets.find(t => t.obj === root) && !root.userData.isTree && !root.userData.isRabbit) root = root.parent;
 
-    if(bonuses.includes(root)) { playSound('loot'); scene.remove(root); bonuses = bonuses.filter(b => b !== root); score += 200; updateUI(); spawnFloatingText(root.position.x, root.position.y, root.position.z, "+200 XP", "#ffff00"); spawnParticles(root.position, 0xffff00); return; }
+    if (root.userData.isTree) {
+        playSound('break'); root.userData.hp--; pixelExplosion(hits[0].point, 0x5c4033);
+        if (root.userData.hp <= 0) {
+            scene.remove(root); woodCount += 3; updateUI(); spawnFloatingText(root.position.x, root.position.y+3, root.position.z, "+3 🪵", "#deb887");
+        }
+        return;
+    }
+
+    if (root.userData.isRabbit) {
+        playSound('music'); scene.remove(root); rabbitObj = null; document.exitPointerLock();
+        document.getElementById('rabbit-screen').style.display = 'flex'; return;
+    }
+
+    if(bonuses.includes(root)) { 
+      playSound('loot'); scene.remove(root); bonuses = bonuses.filter(b => b !== root); 
+      if (Math.random() > 0.5) { healPlayer(); spawnFloatingText(root.position.x, root.position.y, root.position.z, "+1 ❤️", "#ff0000"); }
+      else { score += 200; spawnFloatingText(root.position.x, root.position.y, root.position.z, "+200 XP", "#ffff00"); }
+      updateUI(); spawnParticles(root.position, 0xffff00); return; 
+    }
+    
     if(items.includes(root)) { playSound('loot'); scene.remove(root); items = items.filter(i => i !== root); if(root.userData.type === 'sword_item') { inventory.push('sword'); document.getElementById('slot-1').innerText = "🗡️"; } return; }
 
-    let mobGroup = hit;
-    while(mobGroup.parent && mobGroup.type !== 'Scene' && !targets.find(t => t.obj === mobGroup)) { mobGroup = mobGroup.parent; }
-
+    let mobGroup = hit; while(mobGroup.parent && mobGroup.type !== 'Scene' && !targets.find(t => t.obj === mobGroup)) { mobGroup = mobGroup.parent; }
     const target = targets.find(t => t.obj === mobGroup);
+    
     if(target) {
-      target.obj.userData.isAggro = true;
-      target.obj.userData.aggroTimer = 10;
-      
-      // ✅ ЛОГИКА УРОНА И ХЭДШОТА
-      let isHeadshot = hit.userData.isHead;
-      let damage = isHeadshot ? 3 : 1;
+      target.obj.userData.isAggro = true; target.obj.userData.aggroTimer = 10;
+      let isHeadshot = hit.userData.isHead; let damage = isHeadshot ? 3 : 1;
       target.obj.userData.hp -= damage;
-
       if(isHeadshot) spawnFloatingText(target.obj.position.x, target.obj.position.y+1, target.obj.position.z, "HEADSHOT!", "#ff0000");
 
       if(target.obj.userData.hp <= 0) {
-        playSound('pop');
-        pixelExplosion(target.obj.position, hit.material.color || 0x5D995D);
-        scene.remove(target.obj);
-        targets = targets.filter(t => t !== target);
+        playSound('pop'); pixelExplosion(target.obj.position, hit.material.color || 0x5D995D);
+        scene.remove(target.obj); targets = targets.filter(t => t !== target);
         score += 100; updateUI();
       } else {
-        hit.material.color.setHex(0xff0000);
-        setTimeout(() => hit.material.color.setHex(isHeadshot ? 0xdddddd : 0x5D995D), 200); // возвращаем цвет
+        hit.material.color.setHex(0xff0000); setTimeout(() => hit.material.color.setHex(isHeadshot ? 0xdddddd : 0x5D995D), 200);
       }
     }
   }
@@ -509,79 +565,54 @@ function attack() {
 function pixelExplosion(pos, color) {
   for(let i=0; i<40; i++) {
     const p = new THREE.Mesh(new THREE.BoxGeometry(0.2,0.2,0.2), new THREE.MeshBasicMaterial({color: color}));
-    p.position.copy(pos); p.position.y += Math.random();
-    scene.add(p);
+    p.position.copy(pos); p.position.y += Math.random(); scene.add(p);
     particles.push({m:p, v: new THREE.Vector3((Math.random()-.5)*0.5, Math.random()*0.3, (Math.random()-.5)*0.5)});
   }
 }
 
-// ✅ ЛОГИКА КВИЗА С ФИДБЕКОМ
+// ✅ ЛОГИКА КВИЗА
 function openQuiz(eggMesh) {
-  isQuizActive = true;
-  currentEggMesh = eggMesh;
-  document.exitPointerLock();
-
+  isQuizActive = true; currentEggMesh = eggMesh; document.exitPointerLock();
   const task = eggMesh.userData.task;
-  const ui = document.getElementById('quiz-ui');
-  const img = document.getElementById('quiz-img');
+  const ui = document.getElementById('quiz-ui'); const img = document.getElementById('quiz-img');
   
   if(task.img) { img.src = task.img; img.style.display = 'inline-block'; } else { img.style.display = 'none'; }
   document.getElementById('quiz-q').innerText = task.question;
 
-  const ansBox = document.getElementById('quiz-answers');
-  ansBox.innerHTML = '';
-  
+  const ansBox = document.getElementById('quiz-answers'); ansBox.innerHTML = '';
   let allAns = [...task.wrong, task.correct].sort(() => Math.random() - 0.5);
+  
   allAns.forEach(ans => {
-    const btn = document.createElement('button');
-    btn.className = 'ans-btn'; btn.innerText = ans;
+    const btn = document.createElement('button'); btn.className = 'ans-btn'; btn.innerText = ans;
     btn.onclick = (e) => checkAnswer(e.target, ans, task.correct);
     ansBox.appendChild(btn);
   });
-
   ui.style.display = 'block';
 }
 
 function checkAnswer(btnEl, selected, correct) {
-  // Отключаем кнопки, чтобы не кликали дважды
   document.querySelectorAll('.ans-btn').forEach(b => b.disabled = true);
 
   if(selected === correct) {
-    playSound('heal'); // звук успеха
-    btnEl.classList.add('correct');
-    eggsFound++;
-    updateEggCounter();
-    
-    // Эффект взрыва яйца
+    playSound('heal'); btnEl.classList.add('correct');
+    eggsFound++; updateUI();
     pixelExplosion(currentEggMesh.position, currentEggMesh.userData.baseColor);
-    scene.remove(currentEggMesh);
-    eggs = eggs.filter(e => e !== currentEggMesh);
-
+    scene.remove(currentEggMesh); eggs = eggs.filter(e => e !== currentEggMesh);
   } else {
-    playSound('wrong'); // звук ошибки
-    btnEl.classList.add('wrong');
-    // Показываем где был правильный
-    document.querySelectorAll('.ans-btn').forEach(b => {
-      if(b.innerText === correct) b.classList.add('correct');
-    });
+    playSound('wrong'); btnEl.classList.add('wrong');
   }
 
-  // ✅ ВИЗУАЛЬНЫЙ ФИДБЕК: ждем 1.5 сек перед закрытием окна
   setTimeout(() => {
     document.getElementById('quiz-ui').style.display = 'none';
     isQuizActive = false;
+    peaceTimer = 5.0; // ✅ Таймер мира
     document.body.requestPointerLock();
     if(eggsFound >= levelData.eggs.length && levelData.eggs.length > 0) showWinScreen();
   }, 1500);
 }
 
-function updateEggCounter() {
-  document.getElementById('egg-counter').innerText = `🥚 ${eggsFound} / ${levelData.eggs.length}`;
-}
-
 function showWinScreen() {
-  document.exitPointerLock();
-  playSound('music');
+  document.exitPointerLock(); playSound('music');
   document.getElementById('win-msg').innerText = levelData.endMessage || "С Праздником!";
   document.getElementById('win-screen').style.display = 'flex';
 }
@@ -590,6 +621,8 @@ function updateUI() {
   document.getElementById('lvl-num').innerText = score;
   document.getElementById('combo-num').innerText = combo;
   document.getElementById('xp-fill').style.width = Math.min(100, (score % 1000) / 10) + '%';
+  document.getElementById('egg-counter').innerText = `🥚 ${eggsFound} / ${levelData.eggs.length}`;
+  document.getElementById('wood-counter').innerText = `🪵 ${woodCount}`;
 }
 
 function checkHouseProtection(pos) {
@@ -602,9 +635,8 @@ function checkHouseProtection(pos) {
 function spawnParticles(pos, color, isHeart = false) {
   for(let i=0; i<10; i++) {
     let p;
-    if(isHeart) {
-      const heart = new THREE.Sprite(new THREE.SpriteMaterial({map: heartTexture, color: 0xffffff})); heart.scale.set(0.5, 0.5, 1); p = heart;
-    } else { p = new THREE.Mesh(new THREE.BoxGeometry(0.15,0.15,0.15), new THREE.MeshBasicMaterial({color: color})); }
+    if(isHeart) { const heart = new THREE.Sprite(new THREE.SpriteMaterial({map: heartTexture, color: 0xffffff})); heart.scale.set(0.5, 0.5, 1); p = heart; } 
+    else { p = new THREE.Mesh(new THREE.BoxGeometry(0.15,0.15,0.15), new THREE.MeshBasicMaterial({color: color})); }
     p.position.copy(pos); scene.add(p);
     particles.push({m:p, v: new THREE.Vector3((Math.random()-.5)*0.5, Math.random()*0.5, (Math.random()-.5)*0.5)});
   }
@@ -633,7 +665,7 @@ function updatePhysics(delta) {
   for(let h of houses) {
     if(h.hp <= 0) continue;
     if (nextX > h.bounds.minX - wallT && nextX < h.bounds.minX + wallT && camera.position.z > h.bounds.minZ && camera.position.z < h.bounds.maxZ) canMoveX = false;
-    if (nextX > h.bounds.maxX - wallT && nextX < h.bounds.maxX + wallT && camera.position.z > h.bounds.minZ && camera.position.z < h.bounds.maxZ) { if (camera.position.z < h.pos.z - 1.0 || camera.position.z > h.pos.z + 1.0) canMoveX = false; }
+    if (nextX > h.bounds.maxX - wallT && nextX < h.bounds.maxX + wallT && camera.position.z > h.bounds.minZ && camera.position.z < h.bounds.maxZ) { if (camera.position.z < h.bounds.minZ+1 || camera.position.z > h.bounds.maxZ-1) canMoveX = false; }
     if (camera.position.x > h.bounds.minX && camera.position.x < h.bounds.maxX && nextZ > h.bounds.minZ - wallT && nextZ < h.bounds.minZ + wallT) canMoveZ = false;
     if (camera.position.x > h.bounds.minX && camera.position.x < h.bounds.maxX && nextZ > h.bounds.maxZ - wallT && nextZ < h.bounds.maxZ + wallT) canMoveZ = false;
   }
@@ -655,6 +687,13 @@ function updatePhysics(delta) {
 function animate() {
   requestAnimationFrame(animate); if(isDead) return;
   const delta = clock.getDelta(); const now = Date.now() / 1000;
+  
+  if(peaceTimer > 0) { 
+      peaceTimer -= delta; 
+      document.getElementById('peace-status').style.display = 'block'; 
+      document.getElementById('peace-status').innerText = `🕊️ ПЕРЕМИРИЕ (${Math.ceil(peaceTimer)}С)`; 
+  } else { document.getElementById('peace-status').style.display = 'none'; }
+
   updatePhysics(delta);
 
   const offset = weaponGroup.userData.offset || new THREE.Vector3(0.5, -0.5, -0.8);
@@ -668,15 +707,33 @@ function animate() {
     else { if(currentWeaponType === 'gun') weaponGroup.position.z += Math.sin(swingProgress)*0.1; else weaponGroup.rotateX(-Math.sin(swingProgress)); }
   } else weaponGroup.rotateX(currentWeaponType !== 'gun' ? Math.PI/8 : 0);
 
+  // Кролик
+  if(rabbitObj) {
+      rabbitObj.userData.timer -= delta;
+      if(rabbitObj.userData.timer <= 0) {
+         rabbitObj.userData.timer = 1 + Math.random();
+         rabbitObj.userData.vel.set((Math.random()-0.5)*20, 8, (Math.random()-0.5)*20);
+         rabbitObj.lookAt(rabbitObj.position.clone().add(rabbitObj.userData.vel));
+      }
+      rabbitObj.position.add(rabbitObj.userData.vel.clone().multiplyScalar(delta));
+      rabbitObj.userData.vel.y -= 30 * delta;
+      if(rabbitObj.position.y < 0) { rabbitObj.position.y = 0; rabbitObj.userData.vel.y = 0; rabbitObj.userData.vel.x *= 0.9; rabbitObj.userData.vel.z *= 0.9; }
+      rabbitObj.position.x = Math.max(WORLD_MIN, Math.min(WORLD_MAX, rabbitObj.position.x));
+      rabbitObj.position.z = Math.max(WORLD_MIN, Math.min(WORLD_MAX, rabbitObj.position.z));
+  }
+
   targets.forEach(t => {
     const mob = t.obj; const distToPlayer = mob.position.distanceTo(camera.position); const home = mob.userData.home || mob.position.clone();
     if (distToPlayer > MOB_PLAYER_MAX_DIST) { const dirHome = home.clone().sub(mob.position); if (dirHome.length() > 0.001) { dirHome.normalize(); mob.position.add(dirHome.multiplyScalar(8 * delta)); } else { mob.position.copy(home); } }
+
+    if (peaceTimer <= 0 && distToPlayer < 25) mob.userData.isAggro = true;
+    else if (peaceTimer > 0) mob.userData.isAggro = false;
 
     if(mob.userData.isAggro && !isQuizActive) {
       mob.userData.aggroTimer -= delta; if (mob.userData.aggroTimer <= 0) mob.userData.isAggro = false;
       mob.lookAt(camera.position.x, 0, camera.position.z);
       if(distToPlayer > 2.0) { mob.translateZ(6 * delta); } else {
-        if(Math.random() < 0.03) {
+        if(Math.random() < 0.04) {
           health--; const hearts = document.querySelectorAll('.heart');
           for(let i=hearts.length-1; i>=0; i--) { if(!hearts[i].classList.contains('lost')) { hearts[i].classList.add('lost'); break; } }
           document.getElementById('damage-overlay').style.opacity = 0.5; setTimeout(() => document.getElementById('damage-overlay').style.opacity = 0, 100);
@@ -708,11 +765,10 @@ function animate() {
     if(p.m.position.y < 0) { scene.remove(p.m); particles.splice(i,1); }
   }
 
-  const time = now * 0.05; scene.background.setHSL(0.6, 0.5, 0.5 + Math.sin(time)*0.2);
   renderer.render(scene, camera);
 }
 
-document.body.addEventListener('click', () => { if(audioCtx.state === 'suspended') audioCtx.resume(); if(!isDead && !isQuizActive) document.body.requestPointerLock(); });
+document.body.addEventListener('click', (e) => { if(e.button !== 2 && audioCtx.state === 'suspended') audioCtx.resume(); if(!isDead && !isQuizActive) document.body.requestPointerLock(); });
 
 (async () => { await loadLevelData(); init(); })();
 </script>
