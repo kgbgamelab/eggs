@@ -9,7 +9,7 @@
     body { margin: 0; overflow: hidden; background: #00BFFF; font-family: 'VT323', monospace; user-select: none; }
     #hud { position: absolute; width: 100%; height: 100%; pointer-events: none; display: none; }
 
-    /* СТАРТОВЫЙ ЭКРАН */
+    /* СТАРТОВЫЙ ЭКРАН С ВЫБОРОМ СЛОЖНОСТИ */
     #start-screen {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(10, 5, 16, 0.95); display: flex; flex-direction: column;
@@ -21,12 +21,12 @@
     .start-btn { background: #ffaa00; border: none; padding: 15px 40px; font-size: 24px; font-weight: bold; border-radius: 10px; cursor: pointer; transition: 0.2s; width: 100%; }
     .start-btn:hover { background: #ff55ff; color: white; transform: scale(1.05); }
 
-    /* UI КВИЗА (Исправлено вылезание текста) */
+    /* UI КВИЗА С ФИДБЕКОМ */
     #quiz-ui {
       display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
       background: rgba(30, 10, 46, 0.98); border: 6px solid #ffaa00; padding: 40px;
       text-align: center; border-radius: 20px; box-shadow: 0 0 80px rgba(255, 170, 0, 0.6); 
-      pointer-events: auto; z-index: 1000; width: 600px; max-width: 90%; color: white; font-family: 'Montserrat', sans-serif;
+      pointer-events: auto; z-index: 1000; width: 550px; color: white; font-family: 'Montserrat', sans-serif;
     }
     #quiz-img { max-width: 100%; max-height: 250px; object-fit: contain; border-radius: 10px; display: none; margin-bottom: 20px; border: 2px solid #55ffff; }
     #quiz-q { 
@@ -35,7 +35,7 @@
       max-height: 200px; overflow-y: auto; width: 100%; 
     }
     .ans-btn {
-      display: block; width: 100%; padding: 15px; margin-bottom: 10px; font-size: 20px; font-family: 'Montserrat'; font-weight: bold;
+      display: block; width: 100%; padding: 15px; margin-bottom: 10px; font-size: 22px; font-family: 'Montserrat'; font-weight: bold;
       background: #000; color: #fff; border: 2px solid #ff55ff; border-radius: 8px; cursor: pointer; transition: 0.2s;
       white-space: normal; word-wrap: break-word;
     }
@@ -45,15 +45,15 @@
 
     #egg-counter { position: absolute; top: 20px; right: 30px; font-size: 50px; color: #fff; text-shadow: 4px 4px 0 #ffaa00; }
     #wood-counter { position: absolute; top: 80px; right: 30px; font-size: 40px; color: #fff; text-shadow: 3px 3px 0 #8B4513; }
-    #build-hint { position: absolute; top: 130px; right: 30px; font-size: 20px; color: #fff; font-family: 'Montserrat'; text-shadow: 2px 2px 0 #000; }
+    #build-hint { position: absolute; top: 130px; right: 30px; font-size: 20px; color: #fff; font-family: 'Montserrat'; text-shadow: 2px 2px 0 #000; text-align: right; }
 
-    /* ФИНАЛЬНЫЙ ЭКРАН С ОЧКАМИ И АЧИВКАМИ */
+    /* ФИНАЛЬНЫЙ ЭКРАН */
     #win-screen { 
       display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
       flex-direction: column; align-items: center; justify-content: center; 
       background: rgba(10, 5, 16, 0.95); z-index: 1001; pointer-events: auto; text-align: center;
     }
-    #win-title { font-size: 80px; color: #ffaa00; text-shadow: 5px 5px 0 #ff00ff; margin: 0; font-family: 'VT323'; }
+    #win-title { font-size: 90px; color: #ffaa00; text-shadow: 5px 5px 0 #ff00ff; margin: 0; font-family: 'VT323'; }
     #win-msg { font-size: 30px; color: #55ffff; margin-top: 10px; font-family: 'Montserrat'; font-weight: bold; }
     #final-score { font-size: 50px; color: #00ff00; font-family: 'VT323'; margin: 20px 0; text-shadow: 2px 2px 0 #000; }
     
@@ -82,6 +82,7 @@
 
     #house-status { position: absolute; top: 100px; width: 100%; text-align: center; font-size: 30px; color: #55ff55; text-shadow: 2px 2px 0 #000; display: none; }
     #peace-status { position: absolute; top: 140px; width: 100%; text-align: center; font-size: 30px; color: #55ffff; text-shadow: 2px 2px 0 #000; display: none; }
+
     #crosshair { position: absolute; top: 50%; left: 50%; width: 24px; height: 24px; transform: translate(-50%, -50%); mix-blend-mode: difference; }
     #crosshair::before { content: ''; position: absolute; top: 11px; left: 0; width: 24px; height: 2px; background: white; }
     #crosshair::after { content: ''; position: absolute; top: 0; left: 11px; width: 2px; height: 24px; background: white; }
@@ -98,6 +99,7 @@
     #hotbar { display: flex; justify-content: center; gap: 4px; background: rgba(0,0,0,0.6); padding: 5px; border: 2px solid #fff; border-radius: 4px; }
     .slot { width: 60px; height: 60px; background: #8b8b8b; border: 4px solid #373737; border-top-color: #ddd; border-left-color: #ddd; display: flex; align-items: center; justify-content: center; font-size: 30px; color: white; }
     .slot.active { border-color: white; background: #a0a0a0; transform: scale(1.1); }
+    
     #damage-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: red; opacity: 0; pointer-events: none; transition: opacity 0.1s; }
     #game-over { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; color: white; z-index: 999; background: rgba(50,0,0,0.9); }
     .btn-respawn { font-size: 40px; cursor: pointer; color: #ffff55; text-decoration: underline; margin-top: 20px; }
@@ -123,7 +125,7 @@
 <div id="hud">
   <div id="egg-counter">🥚 0 / 0</div>
   <div id="wood-counter">🪵 0</div>
-  <div id="build-hint">3 + ПКМ = Строить укрытие (10🪵)</div>
+  <div id="build-hint">3 = Дом (ПКМ). 4 = Топор</div>
   <div id="house-status">🛡️ В УКРЫТИИ</div>
   <div id="peace-status">🕊️ ПЕРЕМИРИЕ</div>
   <div id="crosshair"></div>
@@ -140,6 +142,7 @@
       <div class="slot active" id="slot-0">🔫</div>
       <div class="slot" id="slot-1">🗡️</div>
       <div class="slot" id="slot-2">🪵</div>
+      <div class="slot" id="slot-3">🪓</div>
     </div>
   </div>
 </div>
@@ -170,16 +173,16 @@
 </div>
 
 <script>
-// --- МУЛЬТИЯЗЫЧНОСТЬ ДВИЖКА (С АЧИВКАМИ) ---
+// --- МУЛЬТИЯЗЫЧНОСТЬ ДВИЖКА (С АЧИВКАМИ И ПОДСКАЗКАМИ) ---
 const i18nEngine = {
-  ru: { title: "🐰 ОХОТА НА ЯЙЦА PRO 🐰", diffL: "Сложность:", dE: "Легко (Мобы мирные)", dN: "Средне (Мало мобов)", dH: "Сложно (Много мобов)", start: "НАЧАТЬ ИГРУ", build: "3 + ПКМ = Строить укрытие (10🪵)", safe: "🛡️ В УКРЫТИИ", peace: "🕊️ ПЕРЕМИРИЕ", winT: "🏆 ПОБЕДА!", winB: "ИГРАТЬ СНОВА", rT: "🌟 ЛЕГЕНДАРНАЯ АЧИВКА! 🌟", rD: "ТЫ ПОЙМАЛ ПАСХАЛЬНОГО КРОЛИКА!", rB: "КРУТО!", resp: "Возродиться", score: "Счет:", ach1: "🥚 Первое яйцо", ach2: "🪓 Дровосек", ach3: "🎯 Снайпер", ach4: "🏠 Мастер-строитель", ach5: "🐇 Ловец кроликов" },
-  en: { title: "🐰 EASTER EGG HUNT PRO 🐰", diffL: "Difficulty:", dE: "Easy (Peaceful)", dN: "Normal (Few mobs)", dH: "Hard (Many mobs)", start: "START GAME", build: "3 + RMB = Build House (10🪵)", safe: "🛡️ SAFE ZONE", peace: "🕊️ PEACE", winT: "🏆 VICTORY!", winB: "PLAY AGAIN", rT: "🌟 LEGENDARY ACHIEVEMENT! 🌟", rD: "YOU CAUGHT THE EASTER BUNNY!", rB: "AWESOME!", resp: "Respawn", score: "Score:", ach1: "🥚 First Egg", ach2: "🪓 Woodcutter", ach3: "🎯 Sniper", ach4: "🏠 Master Builder", ach5: "🐇 Bunny Catcher" },
-  fr: { title: "🐰 CHASSE AUX OEUFS PRO 🐰", diffL: "Difficulté:", dE: "Facile (Pacifique)", dN: "Normal (Peu de monstres)", dH: "Difficile (Beaucoup de monstres)", start: "JOUER", build: "3 + Clic Droit = Construire (10🪵)", safe: "🛡️ ZONE SÉCURISÉE", peace: "🕊️ PAIX", winT: "🏆 VICTOIRE!", winB: "REJOUER", rT: "🌟 SUCCÈS LÉGENDAIRE! 🌟", rD: "TU AS ATTRAPÉ LE LAPIN DE PÂQUES!", rB: "GÉNIAL!", resp: "Réapparaître", score: "Score final:", ach1: "🥚 Premier œuf", ach2: "🪓 Bûcheron", ach3: "🎯 Sniper", ach4: "🏠 Bâtisseur", ach5: "🐇 Chasseur de lapin" },
-  de: { title: "🐰 OSTEREIERSUCHE PRO 🐰", diffL: "Schwierigkeit:", dE: "Leicht (Friedlich)", dN: "Normal (Wenige Mobs)", dH: "Schwer (Viele Mobs)", start: "SPIEL STARTEN", build: "3 + RMT = Bauen (10🪵)", safe: "🛡️ SICHERHEITSZONE", peace: "🕊️ FRIEDEN", winT: "🏆 SIEG!", winB: "NOCHMAL SPIELEN", rT: "🌟 LEGENDÄRER ERFOLG! 🌟", rD: "DU HAST DEN OSTERHASEN GEFANGEN!", rB: "GENIAL!", resp: "Wiederbeleben", score: "Punkte:", ach1: "🥚 Erstes Ei", ach2: "🪓 Holzfäller", ach3: "🎯 Scharfschütze", ach4: "🏠 Baumeister", ach5: "🐇 Hasenfänger" },
-  es: { title: "🐰 BÚSQUEDA DE HUEVOS PRO 🐰", diffL: "Dificultad:", dE: "Fácil (Pacífico)", dN: "Normal (Pocos mobs)", dH: "Difícil (Muchos mobs)", start: "EMPEZAR", build: "3 + Click Der = Construir (10🪵)", safe: "🛡️ ZONA SEGURA", peace: "🕊️ PAZ", winT: "🏆 ¡VICTORIA!", winB: "JUGAR DE NUEVO", rT: "🌟 ¡LOGRO LEGENDARIO! 🌟", rD: "¡ATRAPASTE AL CONEJO DE PASCUA!", rB: "¡GENIAL!", resp: "Reaparecer", score: "Puntuación:", ach1: "🥚 Primer Huevo", ach2: "🪓 Leñador", ach3: "🎯 Francotirador", ach4: "🏠 Constructor", ach5: "🐇 Cazador de conejos" },
-  it: { title: "🐰 CACCIA ALLE UOVA PRO 🐰", diffL: "Difficoltà:", dE: "Facile (Pacifico)", dN: "Normale (Pochi mob)", dH: "Difficile (Molti mob)", start: "INIZIA GIOCO", build: "3 + Tasto Destro = Costruisci (10🪵)", safe: "🛡️ ZONA SICURA", peace: "🕊️ PACE", winT: "🏆 VITTORIA!", winB: "GIOCA ANCORA", rT: "🌟 OBIETTIVO LEGGENDARIO! 🌟", rD: "HAI PRESO IL CONIGLIO DI PASQUA!", rB: "FANTASTICO!", resp: "Rinasci", score: "Punteggio:", ach1: "🥚 Primo Uovo", ach2: "🪓 Taglialegna", ach3: "🎯 Cecchino", ach4: "🏠 Costruttore", ach5: "🐇 Cacciatore di conigli" },
-  ja: { title: "🐰 エッグハント PRO 🐰", diffL: "難易度:", dE: "簡単（平和）", dN: "普通（モブ少なめ）", dH: "難しい（モブ多い）", start: "ゲーム開始", build: "3 + 右クリック ＝ 建てる (10🪵)", safe: "🛡️ 安全地帯", peace: "🕊️ 平野", winT: "🏆 勝利！", winB: "もう一度プレイ", rT: "🌟 伝説の実績！ 🌟", rD: "イースターバニーを捕まえた！", rB: "すごい！", resp: "リスポーン", score: "最終スコア:", ach1: "🥚 最初の卵", ach2: "🪓 木こり", ach3: "🎯 スナイパー", ach4: "🏠 建築家", ach5: "🐇 ウサギ捕り" },
-  zh: { title: "🐰 寻找彩蛋 PRO 🐰", diffL: "难度:", dE: "简单（和平）", dN: "普通（少量怪物）", dH: "困难（大量怪物）", start: "开始游戏", build: "3 + 右键 = 建造 (10🪵)", safe: "🛡️ 安全区", peace: "🕊️ 和平", winT: "🏆 胜利！", winB: "再玩一次", rT: "🌟 传奇成就！ 🌟", rD: "你抓住了复活节兔子！", rB: "太棒了！", resp: "重生", score: "最终得分:", ach1: "🥚 第一个蛋", ach2: "🪓 伐木工", ach3: "🎯 神枪手", ach4: "🏠 建筑师", ach5: "🐇 兔子猎人" }
+  ru: { title: "🐰 ОХОТА НА ЯЙЦА PRO 🐰", diffL: "Сложность:", dE: "Легко (Мобы мирные)", dN: "Средне (Мало мобов)", dH: "Сложно (Много мобов)", start: "НАЧАТЬ ИГРУ", build: "3=Дерево+ПКМ (Дом). 4=Топор", safe: "🛡️ В УКРЫТИИ", peace: "🕊️ ПЕРЕМИРИЕ", winT: "🏆 ПОБЕДА!", winB: "ИГРАТЬ СНОВА", rT: "🌟 ЛЕГЕНДАРНАЯ АЧИВКА! 🌟", rD: "ТЫ ПОЙМАЛ ПАСХАЛЬНОГО КРОЛИКА!", rB: "КРУТО!", resp: "Возродиться", score: "Счет:", ach1: "🥚 Первое яйцо", ach2: "🪓 Дровосек", ach3: "🎯 Снайпер", ach4: "🏠 Мастер-строитель", ach5: "🐇 Ловец кроликов" },
+  en: { title: "🐰 EASTER EGG HUNT PRO 🐰", diffL: "Difficulty:", dE: "Easy (Peaceful)", dN: "Normal (Few mobs)", dH: "Hard (Many mobs)", start: "START GAME", build: "3=Wood+RMB (House). 4=Axe", safe: "🛡️ SAFE ZONE", peace: "🕊️ PEACE", winT: "🏆 VICTORY!", winB: "PLAY AGAIN", rT: "🌟 LEGENDARY ACHIEVEMENT! 🌟", rD: "YOU CAUGHT THE EASTER BUNNY!", rB: "AWESOME!", resp: "Respawn", score: "Score:", ach1: "🥚 First Egg", ach2: "🪓 Woodcutter", ach3: "🎯 Sniper", ach4: "🏠 Master Builder", ach5: "🐇 Bunny Catcher" },
+  fr: { title: "🐰 CHASSE AUX OEUFS PRO 🐰", diffL: "Difficulté:", dE: "Facile (Pacifique)", dN: "Normal (Peu de monstres)", dH: "Difficile (Beaucoup de monstres)", start: "JOUER", build: "3=Bois+ClicD (Maison). 4=Hache", safe: "🛡️ ZONE SÉCURISÉE", peace: "🕊️ PAIX", winT: "🏆 VICTOIRE!", winB: "REJOUER", rT: "🌟 SUCCÈS LÉGENDAIRE! 🌟", rD: "TU AS ATTRAPÉ LE LAPIN DE PÂQUES!", rB: "GÉNIAL!", resp: "Réapparaître", score: "Score final:", ach1: "🥚 Premier œuf", ach2: "🪓 Bûcheron", ach3: "🎯 Sniper", ach4: "🏠 Bâtisseur", ach5: "🐇 Chasseur de lapin" },
+  de: { title: "🐰 OSTEREIERSUCHE PRO 🐰", diffL: "Schwierigkeit:", dE: "Leicht (Friedlich)", dN: "Normal (Wenige Mobs)", dH: "Schwer (Viele Mobs)", start: "SPIEL STARTEN", build: "3=Holz+RMT (Haus). 4=Axt", safe: "🛡️ SICHERHEITSZONE", peace: "🕊️ FRIEDEN", winT: "🏆 SIEG!", winB: "NOCHMAL SPIELEN", rT: "🌟 LEGENDÄRER ERFOLG! 🌟", rD: "DU HAST DEN OSTERHASEN GEFANGEN!", rB: "GENIAL!", resp: "Wiederbeleben", score: "Punkte:", ach1: "🥚 Erstes Ei", ach2: "🪓 Holzfäller", ach3: "🎯 Scharfschütze", ach4: "🏠 Baumeister", ach5: "🐇 Hasenfänger" },
+  es: { title: "🐰 BÚSQUEDA DE HUEVOS PRO 🐰", diffL: "Dificultad:", dE: "Fácil (Pacífico)", dN: "Normal (Pocos mobs)", dH: "Difícil (Muchos mobs)", start: "EMPEZAR", build: "3=Madera+ClickD (Casa). 4=Hacha", safe: "🛡️ ZONA SEGURA", peace: "🕊️ PAZ", winT: "🏆 ¡VICTORIA!", winB: "JUGAR DE NUEVO", rT: "🌟 ¡LOGRO LEGENDARIO! 🌟", rD: "¡ATRAPASTE AL CONEJO DE PASCUA!", rB: "¡GENIAL!", resp: "Reaparecer", score: "Puntuación:", ach1: "🥚 Primer Huevo", ach2: "🪓 Leñador", ach3: "🎯 Francotirador", ach4: "🏠 Constructor", ach5: "🐇 Cazador de conejos" },
+  it: { title: "🐰 CACCIA ALLE UOVA PRO 🐰", diffL: "Difficoltà:", dE: "Facile (Pacifico)", dN: "Normale (Pochi mob)", dH: "Difficile (Molti mob)", start: "INIZIA GIOCO", build: "3=Legno+Destro (Casa). 4=Ascia", safe: "🛡️ ZONA SICURA", peace: "🕊️ PACE", winT: "🏆 VITTORIA!", winB: "GIOCA ANCORA", rT: "🌟 OBIETTIVO LEGGENDARIO! 🌟", rD: "HAI PRESO IL CONIGLIO DI PASQUA!", rB: "FANTASTICO!", resp: "Rinasci", score: "Punteggio:", ach1: "🥚 Primo Uovo", ach2: "🪓 Taglialegna", ach3: "🎯 Cecchino", ach4: "🏠 Costruttore", ach5: "🐇 Cacciatore di conigli" },
+  ja: { title: "🐰 エッグハント PRO 🐰", diffL: "難易度:", dE: "簡単（平和）", dN: "普通（モブ少なめ）", dH: "難しい（モブ多い）", start: "ゲーム開始", build: "3=木+右クリック(家). 4=斧", safe: "🛡️ 安全地帯", peace: "🕊️ 平和", winT: "🏆 勝利！", winB: "もう一度プレイ", rT: "🌟 伝説の実績！ 🌟", rD: "イースターバニーを捕まえた！", rB: "すごい！", resp: "リスポーン", score: "最終スコア:", ach1: "🥚 最初の卵", ach2: "🪓 木こり", ach3: "🎯 スナイパー", ach4: "🏠 建築家", ach5: "🐇 ウサギ捕り" },
+  zh: { title: "🐰 寻找彩蛋 PRO 🐰", diffL: "难度:", dE: "简单（和平）", dN: "普通（少量怪物）", dH: "困难（大量怪物）", start: "开始游戏", build: "3=木+右键(房屋). 4=斧头", safe: "🛡️ 安全区", peace: "🕊️ 和平", winT: "🏆 胜利！", winB: "再玩一次", rT: "🌟 传奇成就！ 🌟", rD: "你抓住了复活节兔子！", rB: "太棒了！", resp: "重生", score: "最终得分:", ach1: "🥚 第一个蛋", ach2: "🪓 伐木工", ach3: "🎯 神枪手", ach4: "🏠 建筑师", ach5: "🐇 兔子猎人" }
 };
 
 let currentLang = 'ru'; 
@@ -214,9 +217,10 @@ let pitch = 0, yaw = 0;
 let isDead = false, isQuizActive = false, gameStarted = false;
 let stepTimer = 0, swingProgress = 0, isSwinging = false;
 let currentWeaponType = 'gun';
+let inventory = ['gun', 'sword', 'wood', 'axe'];
 let peaceTimer = 10.0; 
 let rabbitObj = null;
-let myAchievements = new Set(); // Система ачивок
+let myAchievements = new Set(); 
 
 const WORLD_SIZE = 300;                
 const WORLD_HALF = WORLD_SIZE * 0.5;   
@@ -232,11 +236,13 @@ let eggsFound = 0, currentEggMesh = null;
 
 const DATA_BASE_URL = "https://kgbgamelab.github.io/texts/data/";
 
+function getLevelIdFromUrl() { return new URLSearchParams(location.search).get("id") || ""; }
+
 async function loadLevelData() {
-  const id = new URLSearchParams(location.search).get("id");
+  const id = getLevelIdFromUrl();
   if (!id) {
     levelData.eggs = [
-      { question: "Пример: 2+2?", correct: "4", wrong: ["3", "5"], img: "" }
+      { question: "Пример вопроса?", correct: "Да", wrong: ["Нет"], img: "" }
     ];
     setGameLanguage("ru"); return;
   }
@@ -291,16 +297,19 @@ function playSound(type) {
 function createTexture(type) {
   const canvas = document.createElement('canvas'); canvas.width = 64; canvas.height = 64; const ctx = canvas.getContext('2d');
   const fillNoise = (c) => { ctx.fillStyle = c; ctx.fillRect(0,0,64,64); for(let i=0; i<400; i++) { ctx.fillStyle=`rgba(0,0,0,0.1)`; ctx.fillRect(Math.random()*64,Math.random()*64,4,4); }};
+
   if(type === 'grass_top') { fillNoise('#7CFC00'); ctx.fillStyle='#32CD32'; for(let i=0;i<50;i++) ctx.fillRect(Math.random()*60,Math.random()*60,4,4); } 
   else if (type === 'wood') { ctx.fillStyle='#5c4033'; ctx.fillRect(0,0,64,64); ctx.fillStyle='#4a332a'; for(let i=1;i<4;i++) ctx.fillRect(i*16,0,4,64); }
   else if (type === 'planks') { ctx.fillStyle='#a07040'; ctx.fillRect(0,0,64,64); ctx.fillStyle='#805020'; ctx.fillRect(0,0,64,2); ctx.fillRect(0,20,64,2); ctx.fillRect(0,40,64,2); }
+  else if (type === 'face') { fillNoise('#bcaea5'); ctx.fillStyle='#222'; ctx.fillRect(10,20,12,12); ctx.fillRect(42,20,12,12); ctx.fillStyle='#633'; ctx.fillRect(20,45,24,8); }
   else if (type === 'leaves') { fillNoise('#FFB7C5'); ctx.fillStyle='#FF69B4'; for(let i=0;i<60;i++) ctx.fillRect(Math.random()*60,Math.random()*60,6,6); } 
   else if (type === 'chest') { ctx.fillStyle='#6d4e34'; ctx.fillRect(0,0,64,64); ctx.fillStyle='#000'; ctx.strokeRect(2,2,60,60); ctx.fillStyle='#FFD700'; ctx.fillRect(28,24,8,12); }
   else if (type === 'skel_body') { ctx.fillStyle='#333'; ctx.fillRect(0,0,64,64); ctx.fillStyle='#ddd'; ctx.fillRect(28, 0, 8, 64); for(let i=10; i<50; i+=10) ctx.fillRect(10, i, 44, 4); }
   else if (type === 'skel_face') { ctx.fillStyle='#ccc'; ctx.fillRect(0,0,64,64); ctx.fillStyle='#111'; ctx.fillRect(10,20,16,14); ctx.fillRect(38,20,16,14); ctx.fillRect(28,40,8,8); ctx.fillStyle='#555'; ctx.fillRect(10,55,44,4); }
+
   const tex = new THREE.CanvasTexture(canvas); tex.magFilter = THREE.NearestFilter; return tex;
 }
-const textures = { grass: createTexture('grass_top'), wood: createTexture('wood'), planks: createTexture('planks'), leaves: createTexture('leaves'), chest: createTexture('chest'), skel_body: createTexture('skel_body'), skel_face: createTexture('skel_face') };
+const textures = { grass: createTexture('grass_top'), wood: createTexture('wood'), planks: createTexture('planks'), face: createTexture('face'), leaves: createTexture('leaves'), chest: createTexture('chest'), skel_body: createTexture('skel_body'), skel_face: createTexture('skel_face') };
 
 function generateEggTexture(baseColor) {
   const c = document.createElement('canvas'); c.width=64; c.height=64; const ctx = c.getContext('2d');
@@ -314,8 +323,10 @@ function startGame() {
   difficulty = document.getElementById('diff-select').value;
   document.getElementById('start-screen').style.display = 'none';
   document.getElementById('hud').style.display = 'block';
+  
   if(audioCtx.state === 'suspended') audioCtx.resume();
   document.body.requestPointerLock();
+  
   init(); updateUI(); gameStarted = true;
 }
 
@@ -334,8 +345,12 @@ function init() {
 
   document.addEventListener('keydown', e => {
     if(!gameStarted || isDead || isQuizActive) return;
-    if(e.key === '1') setWeapon('gun'); if(e.key === '2') setWeapon('sword'); if(e.key === '3') setWeapon('wood');
-    if(e.code === 'Space') move.jump = true; if(e.code === 'ShiftLeft') move.sprint = true;
+    if(e.key === '1') setWeapon('gun'); 
+    if(e.key === '2') setWeapon('sword'); 
+    if(e.key === '3') setWeapon('wood'); 
+    if(e.key === '4') setWeapon('axe'); // ✅ Топор
+    if(e.code === 'Space') move.jump = true; 
+    if(e.code === 'ShiftLeft') move.sprint = true;
     handleKeys(e.code, true);
   });
   document.addEventListener('keyup', e => {
@@ -343,12 +358,13 @@ function init() {
     handleKeys(e.code, false);
   });
   
-  // ПРАВИЛЬНАЯ ОБРАБОТКА КЛИКОВ (ЛКМ = Атака, ПКМ = Постройка)
+  // ✅ ОБРАБОТКА КЛИКОВ (Левая - бить, Правая - строить дом)
   document.addEventListener('mousedown', (e) => {
     if(!gameStarted || isDead || isQuizActive) return;
-    if (e.button === 2) { buildBlock(); } // Правая кнопка
-    else if (e.button === 0) { attack(); } // Левая кнопка
+    if (e.button === 2) { buildBlock(e); } 
+    else if (e.button === 0) { attack(e); } 
   });
+  document.addEventListener('contextmenu', e => { e.preventDefault(); buildBlock(e); });
   
   document.addEventListener('mousemove', onMouseMove);
   window.addEventListener('resize', () => { camera.aspect=window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
@@ -378,17 +394,18 @@ function createWorld() {
     const m = createMob(type, type); m.position.set(Math.random()*100-50, 0, Math.random()*100-50);
     m.userData.home = m.position.clone(); scene.add(m); targets.push({obj: m});
   }
-  createRabbit();
+  
+  createRabbit(); // ✅ Кролик из примитивов
 }
 
+// ✅ ПРАВИЛЬНЫЙ БЕЛЫЙ КРОЛИК ИЗ ПРИМИТИВОВ
 function createRabbit() {
   const grp = new THREE.Group();
-  const mat = new THREE.MeshLambertMaterial({color: 0xffffff}); // Чисто белый кролик
+  const mat = new THREE.MeshLambertMaterial({color: 0xffffff}); // 100% БЕЛЫЙ
   
   const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.4, 0.7), mat); body.position.y = 0.2;
   const head = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.4), mat); head.position.set(0, 0.5, -0.4);
   
-  // Глаза (черные) и нос (розовый), смотрят вперед (-Z)
   const eyeL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.06), new THREE.MeshBasicMaterial({color: 0x000000})); eyeL.position.set(-0.15, 0.1, -0.21); head.add(eyeL);
   const eyeR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.06), new THREE.MeshBasicMaterial({color: 0x000000})); eyeR.position.set(0.15, 0.1, -0.21); head.add(eyeR);
   const nose = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.05, 0.05), new THREE.MeshBasicMaterial({color: 0xff9999})); nose.position.set(0, -0.05, -0.21); head.add(nose);
@@ -404,7 +421,7 @@ function createRabbit() {
   const legBR = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.25, 0.2), mat); legBR.position.set(0.2, 0.125, 0.25);
 
   grp.add(body, head, tail, legFL, legFR, legBL, legBR);
-  grp.userData = { isRabbit: true, vel: new THREE.Vector3(), timer: 0, parts: {earL, earR, legBL, legBR, head} };
+  grp.userData = { isRabbit: true, vel: new THREE.Vector3(), timer: 0, parts: {earL, earR, legBL, legBR} };
   grp.position.set(10, 0, 10); scene.add(grp); rabbitObj = grp;
 }
 
@@ -443,21 +460,30 @@ function spawnEggs() {
 }
 
 function setWeapon(type) {
-  currentWeaponType = type; weaponGroup.clear(); document.querySelectorAll('.slot').forEach(s => s.classList.remove('active'));
+  currentWeaponType = type; weaponGroup.clear(); 
+  document.querySelectorAll('.slot').forEach((s, i) => {
+      s.classList.remove('active');
+      if(type === 'gun' && i === 0) s.classList.add('active');
+      if(type === 'sword' && i === 1) s.classList.add('active');
+      if(type === 'wood' && i === 2) s.classList.add('active');
+      if(type === 'axe' && i === 3) s.classList.add('active');
+  });
+
   if(type==='gun') {
-      document.getElementById('slot-0').classList.add('active');
       const body = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.8), new THREE.MeshLambertMaterial({color: 0x333}));
       flash = new THREE.PointLight(0xffaa00, 0, 4); flash.position.z = -1; weaponGroup.add(body, flash);
       weaponGroup.userData = { offset: new THREE.Vector3(0.4, -0.4, -0.6) };
   } else if (type === 'sword') {
-      document.getElementById('slot-1').classList.add('active');
       const blade = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.8, 0.05), new THREE.MeshLambertMaterial({color: 0x88ccff})); blade.position.y = 0.5;
       const handle = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.3, 0.08), new THREE.MeshLambertMaterial({color: 0x5c4033})); handle.position.y = -0.1;
       weaponGroup.add(blade, handle); weaponGroup.userData = { offset: new THREE.Vector3(0.5, -0.5, -0.8) };
   } else if (type === 'wood') {
-      document.getElementById('slot-2').classList.add('active');
       const woodBlock = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.4), new THREE.MeshLambertMaterial({map: textures.planks}));
       weaponGroup.add(woodBlock); weaponGroup.userData = { offset: new THREE.Vector3(0.5, -0.5, -0.8) };
+  } else if (type === 'axe') {
+      const handle = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.6, 0.05), new THREE.MeshLambertMaterial({color: 0x5c4033})); handle.position.y = 0.2;
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.3, 0.3), new THREE.MeshLambertMaterial({color: 0x777777})); head.position.set(0, 0.4, 0.1);
+      weaponGroup.add(handle, head); weaponGroup.userData = { offset: new THREE.Vector3(0.5, -0.5, -0.8) };
   }
 }
 
@@ -470,9 +496,9 @@ function spawnLoot() {
   sword.position.set(5, 0.5, 5); sword.rotation.z = Math.PI/2; sword.userData = { type: 'sword_item' }; scene.add(sword); items.push(sword);
 }
 
-function createMob(text, type) {
+function createMob() {
   const mob = new THREE.Group();
-  const isSkel = (type === 'skeleton');
+  const isSkel = Math.random() > 0.5;
   const skinColor = isSkel ? 0xdddddd : 0x5D995D; const texFace = isSkel ? textures.skel_face : textures.face;
   const matSkin = new THREE.MeshLambertMaterial({color: skinColor});
   const matClothes = new THREE.MeshLambertMaterial({color: isSkel ? 0xcccccc : 0x3C50C4});
@@ -490,7 +516,7 @@ function createMob(text, type) {
   const legR = new THREE.Mesh(legGeo, matSkin); legR.position.set(0.15, 0.75, 0);
 
   mob.add(body, head, armL, armR, legL, legR);
-  mob.userData = { parts: {armL, armR, legL, legR, body, head}, isAggro: false, aggroTimer: 0, type: type || 'zombie', hp: 3, walkTimer: Math.random() * 2, walkDir: new THREE.Vector3(Math.random()-0.5, 0, Math.random()-0.5).normalize(), home: null };
+  mob.userData = { parts: {armL, armR, legL, legR, body, head}, isAggro: false, aggroTimer: 0, type: isSkel ? 'skeleton' : 'zombie', hp: 3, walkTimer: Math.random() * 2, walkDir: new THREE.Vector3(Math.random()-0.5, 0, Math.random()-0.5).normalize(), home: null };
   return mob;
 }
 
@@ -508,7 +534,7 @@ function spawnFloatingText(x, y, z, text, color) {
   document.body.appendChild(div);
   const vec = new THREE.Vector3(x, y + 2, z); vec.project(camera);
   const cx = (vec.x * .5 + .5) * window.innerWidth; const cy = (-(vec.y * .5) + .5) * window.innerHeight;
-  div.style.left = cx + 'px'; div.style.top = cy + 'px'; setTimeout(() => div.remove(), 1000);
+  div.style.left = cx + 'px'; div.style.top = cy + 'px'; setTimeout(() => div.remove(), 1500);
 }
 
 function healPlayer() {
@@ -519,26 +545,27 @@ function healPlayer() {
   }
 }
 
-// ✅ ПОСТРОЙКА ДОМА (Работает только если в руках дерево - кнопка 3)
-function buildBlock() {
-  if(currentWeaponType !== 'wood' || woodCount < 10) return; 
+// ✅ ПОСТРОЙКА ПОЛНОЦЕННОГО ДОМА (СМЕЩЕНО ВПЕРЕД, ЧТОБЫ НЕ ЗАСТРЯТЬ)
+function buildBlock(e) {
+  if(e) e.preventDefault();
+  if(!gameStarted || isDead || isQuizActive || woodCount < 10 || currentWeaponType !== 'wood') return; 
   
-  const ray = new THREE.Raycaster(); ray.setFromCamera(new THREE.Vector2(0,0), camera);
-  const hits = ray.intersectObjects(scene.children, true);
-  if(hits.length > 0 && hits[0].distance < 10) {
-    const pt = hits[0].point.clone().add(hits[0].face.normal.clone().multiplyScalar(0.5));
-    pt.x = Math.round(pt.x); pt.y = Math.round(pt.y); pt.z = Math.round(pt.z);
-    if(pt.y < 0.5) pt.y = 0.5;
-    const block = new THREE.Mesh(new THREE.BoxGeometry(1,1,1), new THREE.MeshLambertMaterial({map: textures.planks}));
-    block.position.copy(pt); scene.add(block);
-    houses.push({ hp: 5, bounds: { minX: pt.x-0.5, maxX: pt.x+0.5, minZ: pt.z-0.5, maxZ: pt.z+0.5 } });
-    woodCount -= 10; builtBlocks++; updateUI(); playSound('step');
-    if(builtBlocks >= 5) unlockAch('ach4'); // Ачивка Строитель
-  }
+  const dir = new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion);
+  dir.y = 0; dir.normalize();
+  
+  // Ставим дом на 12 блоков вперед от камеры (чтобы игрок не застрял внутри)
+  const spawnPos = camera.position.clone().add(dir.multiplyScalar(12));
+  spawnPos.y = 0; // Земля
+  
+  createHouse(spawnPos.x, spawnPos.y, spawnPos.z);
+  
+  woodCount -= 10; builtBlocks++; updateUI(); playSound('step');
+  if(builtBlocks >= 5) unlockAch('ach4'); // Строитель
 }
 
-function attack() {
-  if(currentWeaponType === 'wood') { isSwinging = true; swingProgress = 0; return; } // Деревом не бьем
+function attack(e) {
+  if(e && e.button === 2) return; 
+  if(isDead || isSwinging || isQuizActive || currentWeaponType === 'wood') return; 
   
   isSwinging = true; swingProgress = 0;
   if(currentWeaponType === 'gun') { playSound('shoot'); if(flash) { flash.intensity = 2; setTimeout(()=>flash.intensity=0, 50); } } 
@@ -554,17 +581,23 @@ function attack() {
     let root = hit; while(root.parent && root.parent.type !== 'Scene' && !targets.find(t => t.obj === root) && !root.userData.isTree && !root.userData.isRabbit) root = root.parent;
 
     if (root.userData.isTree) {
+        if(currentWeaponType !== 'axe') { 
+            spawnFloatingText(camera.position.x, camera.position.y, camera.position.z, "Нужен Топор (4)!", "#ff0000"); 
+            return; 
+        }
         playSound('break'); root.userData.hp--; pixelExplosion(hits[0].point, 0x5c4033);
         if (root.userData.hp <= 0) { 
             scene.remove(root); woodCount += 3; updateUI(); 
             spawnFloatingText(root.position.x, root.position.y+3, root.position.z, "+3 🪵", "#deb887"); 
-            if(woodCount >= 30) unlockAch('ach2'); // Ачивка Дровосек
+            if(woodCount >= 30) unlockAch('ach2'); // Дровосек
         } return;
     }
+    
     if (root.userData.isRabbit) { 
-        playSound('music'); scene.remove(root); rabbitObj = null; unlockAch('ach5'); // Ачивка Кролик
+        playSound('music'); scene.remove(root); rabbitObj = null; unlockAch('ach5'); 
         document.exitPointerLock(); document.getElementById('rabbit-screen').style.display = 'flex'; return; 
     }
+    
     if(bonuses.includes(root)) { 
       playSound('loot'); scene.remove(root); bonuses = bonuses.filter(b => b !== root); 
       if (Math.random() > 0.5) { healPlayer(); spawnFloatingText(root.position.x, root.position.y, root.position.z, "+1 ❤️", "#ff0000"); }
@@ -581,7 +614,7 @@ function attack() {
       let isHeadshot = hit.userData.isHead; let damage = isHeadshot ? 3 : 1; target.obj.userData.hp -= damage;
       if(isHeadshot) {
           headshots++; spawnFloatingText(target.obj.position.x, target.obj.position.y+1, target.obj.position.z, "HEADSHOT!", "#ff0000");
-          if(headshots >= 5) unlockAch('ach3'); // Ачивка Снайпер
+          if(headshots >= 5) unlockAch('ach3'); // Снайпер
       }
 
       if(target.obj.userData.hp <= 0) {
@@ -609,14 +642,14 @@ function openQuiz(eggMesh) {
   let qText = task.question;
   let finalImgUrl = task.img || "";
 
-  // Если редактор пропустил картинку, проверяем тут еще раз
+  // Вырезаем любую ссылку из текста вопроса []
   let imgMatch = qText.match(/\[(.*?)\]/);
   if(imgMatch) {
       finalImgUrl = imgMatch[1];
       qText = qText.replace(imgMatch[0], '').trim();
-  } else if (qText.startsWith("http") && (qText.endsWith(".png") || qText.endsWith(".jpg") || qText.endsWith(".gif"))) {
+  } else if (qText.startsWith("http")) { // Если весь вопрос это ссылка
       finalImgUrl = qText;
-      qText = "Посмотри на картинку и ответь:";
+      qText = "Вопрос:";
   }
   
   if(finalImgUrl && finalImgUrl.trim() !== "") { 
@@ -643,7 +676,7 @@ function checkAnswer(btnEl, selected, correct) {
   document.querySelectorAll('.ans-btn').forEach(b => b.disabled = true);
   if(selected === correct) {
     playSound('heal'); btnEl.classList.add('correct'); eggsFound++; score += 500; updateUI();
-    unlockAch('ach1'); // Ачивка за первое яйцо
+    unlockAch('ach1'); // Ачивка Первое Яйцо
     pixelExplosion(currentEggMesh.position, currentEggMesh.userData.baseColor);
     scene.remove(currentEggMesh); eggs = eggs.filter(e => e !== currentEggMesh);
   } else { playSound('wrong'); btnEl.classList.add('wrong'); }
@@ -655,18 +688,17 @@ function checkAnswer(btnEl, selected, correct) {
   }, 1500);
 }
 
-// ✅ ФИНАЛЬНЫЙ ЭКРАН С ПОДСЧЕТОМ И АЧИВКАМИ
 function showWinScreen() {
   document.exitPointerLock(); playSound('music');
   
-  document.getElementById('win-msg').innerText = levelData.endMessage || (i18nEngine[currentLang] ? i18nEngine[currentLang].winT : "С Праздником!");
-  document.getElementById('final-score').innerText = `${i18nEngine[currentLang].score} ${score}`;
+  document.getElementById('win-msg').innerText = levelData.endMessage || (i18n[currentLang] ? i18n[currentLang].winT : "С Праздником!");
+  document.getElementById('final-score').innerText = `${i18n[currentLang].score} ${score}`;
   
-  const list = document.getElementById('achievements-container'); list.innerHTML = '';
+  const list = document.getElementById('achievements-list'); list.innerHTML = '';
   myAchievements.forEach(id => {
       const badge = document.createElement('div');
       badge.className = 'ach-badge';
-      badge.innerText = i18nEngine[currentLang][id];
+      badge.innerText = i18n[currentLang][id];
       list.appendChild(badge);
   });
 
@@ -736,7 +768,7 @@ function animate() {
   
   if(peaceTimer > 0) { 
       peaceTimer -= delta; document.getElementById('peace-status').style.display = 'block'; 
-      let tText = i18nEngine[currentLang] ? i18nEngine[currentLang].peace : "🕊️ ПЕРЕМИРИЕ";
+      let tText = i18n[currentLang] ? i18n[currentLang].peace : "🕊️ ПЕРЕМИРИЕ";
       document.getElementById('peace-status').innerText = `${tText} (${Math.ceil(peaceTimer)}С)`; 
   } else { document.getElementById('peace-status').style.display = 'none'; }
 
