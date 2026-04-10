@@ -9,7 +9,6 @@
     body { margin: 0; overflow: hidden; background: #00BFFF; font-family: 'VT323', monospace; user-select: none; }
     #hud { position: absolute; width: 100%; height: 100%; pointer-events: none; display: none; }
 
-    /* СТАРТОВЫЙ ЭКРАН */
     #start-screen {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(10, 5, 16, 0.95); display: flex; flex-direction: column;
@@ -21,7 +20,6 @@
     .start-btn { background: #ffaa00; border: none; padding: 15px 40px; font-size: 24px; font-weight: bold; border-radius: 10px; cursor: pointer; transition: 0.2s; width: 100%; }
     .start-btn:hover { background: #ff55ff; color: white; transform: scale(1.05); }
 
-    /* UI КВИЗА */
     #quiz-ui {
       display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
       background: rgba(30, 10, 46, 0.98); border: 6px solid #ffaa00; padding: 40px;
@@ -42,7 +40,6 @@
     #wood-counter { position: absolute; top: 80px; right: 30px; font-size: 40px; color: #fff; text-shadow: 3px 3px 0 #8B4513; }
     #build-hint { position: absolute; top: 130px; right: 30px; font-size: 20px; color: #fff; font-family: 'Montserrat'; text-shadow: 2px 2px 0 #000; text-align: right;}
 
-    /* ФИНАЛЬНЫЙ ЭКРАН */
     #win-screen { 
       display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
       flex-direction: column; align-items: center; justify-content: center; 
@@ -80,6 +77,7 @@
     
     #damage-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: red; opacity: 0; pointer-events: none; transition: opacity 0.1s; }
     #game-over { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; color: white; z-index: 999; background: rgba(50,0,0,0.9); }
+    .btn-respawn { font-size: 40px; cursor: pointer; color: #ffff55; text-decoration: underline; margin-top: 20px; }
   </style>
 </head>
 <body>
@@ -106,6 +104,10 @@
   <div id="peace-status">🕊️ ПЕРЕМИРИЕ</div>
   <div id="crosshair"></div>
   <div id="bottom-ui">
+    <div id="xp-info">
+      <span>XP: <span id="lvl-num">0</span></span>
+      <span style="color: #ffd700">COMBO: x<span id="combo-num">0</span></span>
+    </div>
     <div class="hearts" id="hearts-container">
       <div class="heart"></div><div class="heart"></div><div class="heart"></div><div class="heart"></div><div class="heart"></div>
     </div>
@@ -126,9 +128,9 @@
 </div>
 
 <div id="win-screen">
-  <h1 id="win-title">🏆 ПОБЕДА!</h1>
-  <div id="final-score">Score: 0</div>
+  <h1 id="win-title">🏆 АЧИВКА: ВСЕ ЯЙЦА НАЙДЕНЫ!</h1>
   <div id="win-msg">Поздравление!</div>
+  <div id="final-score">Score: 0</div>
   <div id="achievements-container"></div>
   <button id="btn-restart-win" style="margin-top: 20px; padding: 20px 40px; font-size: 30px; cursor: pointer; font-family: 'VT323'; background: #ffaa00; border: none; border-radius: 10px;" onclick="location.reload()">ИГРАТЬ СНОВА</button>
 </div>
@@ -142,19 +144,18 @@
 <div id="game-over">
   <h1 style="font-size: 100px; margin:0; text-shadow: 5px 5px 0 #000; color: #ff5555;">YOU DIED</h1>
   <p class="btn-respawn" id="btn-respawn" onclick="location.reload()">Respawn</p>
-</div>
-
-<script>
-// --- МУЛЬТИЯЗЫЧНОСТЬ ДВИЖКА ---
+</div> 
+  <script>
+// --- МУЛЬТИЯЗЫЧНОСТЬ ДВИЖКА (С АЧИВКАМИ) ---
 const i18nEngine = {
-  ru: { title: "🐰 ОХОТА НА ЯЙЦА PRO 🐰", diffL: "Сложность:", dE: "Легко (Мобы мирные)", dN: "Средне (Мало мобов)", dH: "Сложно (Много мобов)", start: "НАЧАТЬ ИГРУ", build: "3 (Дерево) + ПКМ = Строить дом (10🪵)", peace: "🕊️ ПЕРЕМИРИЕ", winT: "🏆 ПОБЕДА!", winB: "ИГРАТЬ СНОВА", rT: "🌟 ЛЕГЕНДАРНАЯ АЧИВКА! 🌟", rD: "ТЫ ПОЙМАЛ ПАСХАЛЬНОГО КРОЛИКА!", rB: "КРУТО!", resp: "Возродиться", score: "Итоговый счет:", achWeapon: "⚔️ Оружейник", achBuild: "🏠 Строитель", achRabbit: "🐇 Пасхальный кролик", achPeace: "🕊️ Мирный житель", achPirate: "🏴‍☠️ Пират", achEaster: "🥚 Счастливая Пасха!" },
-  en: { title: "🐰 EASTER EGG HUNT PRO 🐰", diffL: "Difficulty:", dE: "Easy (Peaceful)", dN: "Normal (Few mobs)", dH: "Hard (Many mobs)", start: "START GAME", build: "3 (Wood) + RMB = Build House (10🪵)", peace: "🕊️ PEACE", winT: "🏆 VICTORY!", winB: "PLAY AGAIN", rT: "🌟 LEGENDARY ACHIEVEMENT! 🌟", rD: "YOU CAUGHT THE EASTER BUNNY!", rB: "AWESOME!", resp: "Respawn", score: "Total Score:", achWeapon: "⚔️ Gunsmith", achBuild: "🏠 Builder", achRabbit: "🐇 Easter Bunny", achPeace: "🕊️ Pacifist", achPirate: "🏴‍☠️ Pirate", achEaster: "🥚 Happy Easter!" },
-  fr: { title: "🐰 CHASSE AUX OEUFS PRO 🐰", diffL: "Difficulté:", dE: "Facile (Pacifique)", dN: "Normal (Peu de monstres)", dH: "Difficile (Beaucoup)", start: "JOUER", build: "3 (Bois) + Clic Droit = Maison (10🪵)", peace: "🕊️ PAIX", winT: "🏆 VICTOIRE!", winB: "REJOUER", rT: "🌟 SUCCÈS LÉGENDAIRE! 🌟", rD: "TU AS ATTRAPÉ LE LAPIN!", rB: "GÉNIAL!", resp: "Réapparaître", score: "Score final:", achWeapon: "⚔️ Armurier", achBuild: "🏠 Bâtisseur", achRabbit: "🐇 Lapin de Pâques", achPeace: "🕊️ Pacifiste", achPirate: "🏴‍☠️ Pirate", achEaster: "🥚 Joyeuses Pâques!" },
-  de: { title: "🐰 OSTEREIERSUCHE PRO 🐰", diffL: "Schwierigkeit:", dE: "Leicht (Friedlich)", dN: "Normal (Wenige Mobs)", dH: "Schwer (Viele Mobs)", start: "START", build: "3 (Holz) + RMT = Haus bauen (10🪵)", peace: "🕊️ FRIEDEN", winT: "🏆 SIEG!", winB: "NOCHMAL SPIELEN", rT: "🌟 LEGENDÄRER ERFOLG! 🌟", rD: "DU HAST DEN HASEN GEFANGEN!", rB: "GENIAL!", resp: "Wiederbeleben", score: "Gesamtpunkte:", achWeapon: "⚔️ Waffenschmied", achBuild: "🏠 Baumeister", achRabbit: "🐇 Osterhase", achPeace: "🕊️ Pazifist", achPirate: "🏴‍☠️ Pirat", achEaster: "🥚 Frohe Ostern!" },
-  es: { title: "🐰 BÚSQUEDA DE HUEVOS PRO 🐰", diffL: "Dificultad:", dE: "Fácil (Pacífico)", dN: "Normal (Pocos mobs)", dH: "Difícil (Muchos mobs)", start: "EMPEZAR", build: "3 (Madera) + Click Der = Casa (10🪵)", peace: "🕊️ PAZ", winT: "🏆 ¡VICTORIA!", winB: "JUGAR DE NUEVO", rT: "🌟 ¡LOGRO LEGENDARIO! 🌟", rD: "¡ATRAPASTE AL CONEJO!", rB: "¡GENIAL!", resp: "Reaparecer", score: "Puntuación total:", achWeapon: "⚔️ Armero", achBuild: "🏠 Constructor", achRabbit: "🐇 Conejo de Pascua", achPeace: "🕊️ Pacifista", achPirate: "🏴‍☠️ Pirata", achEaster: "🥚 ¡Felices Pascuas!" },
-  it: { title: "🐰 CACCIA ALLE UOVA PRO 🐰", diffL: "Difficoltà:", dE: "Facile (Pacifico)", dN: "Normale (Pochi mob)", dH: "Difficile (Molti mob)", start: "INIZIA", build: "3 (Legno) + Tasto Destro = Casa (10🪵)", peace: "🕊️ PACE", winT: "🏆 VITTORIA!", winB: "GIOCA ANCORA", rT: "🌟 OBIETTIVO LEGGENDARIO! 🌟", rD: "HAI PRESO IL CONIGLIO!", rB: "FANTASTICO!", resp: "Rinasci", score: "Punteggio finale:", achWeapon: "⚔️ Armaiolo", achBuild: "🏠 Costruttore", achRabbit: "🐇 Coniglietto di Pasqua", achPeace: "🕊️ Pacifista", achPirate: "🏴‍☠️ Pirata", achEaster: "🥚 Buona Pasqua!" },
-  ja: { title: "🐰 エッグハント PRO 🐰", diffL: "難易度:", dE: "簡単（平和）", dN: "普通（モブ少なめ）", dH: "難しい（モブ多い）", start: "ゲーム開始", build: "3 (木) + 右クリック = 家を建てる (10🪵)", peace: "🕊️ 平和", winT: "🏆 勝利！", winB: "もう一度プレイ", rT: "🌟 伝説の実績！ 🌟", rD: "バニーを捕まえた！", rB: "すごい！", resp: "リスポーン", score: "最終スコア:", achWeapon: "⚔️ ガンスミス", achBuild: "🏠 建築家", achRabbit: "🐇 イースターバニー", achPeace: "🕊️ 平和主義者", achPirate: "🏴‍☠️ 海賊", achEaster: "🥚 ハッピーイースター！" },
-  zh: { title: "🐰 寻找彩蛋 PRO 🐰", diffL: "难度:", dE: "简单（和平）", dN: "普通（少量怪物）", dH: "困难（大量怪物）", start: "开始游戏", build: "3 (木头) + 右键 = 建造房屋 (10🪵)", peace: "🕊️ 和平", winT: "🏆 胜利！", winB: "再玩一次", rT: "🌟 传奇成就！ 🌟", rD: "你抓住了兔子！", rB: "太棒了！", resp: "重生", score: "最终得分:", achWeapon: "⚔️ 武器大师", achBuild: "🏠 建筑师", achRabbit: "🐇 复活节兔子", achPeace: "🕊️ 和平主义者", achPirate: "🏴‍☠️ 海盗", achEaster: "🥚 复活节快乐！" }
+  ru: { title: "🐰 ОХОТА НА ЯЙЦА PRO 🐰", diffL: "Сложность:", dE: "Легко (Мобы мирные)", dN: "Средне (Мало мобов)", dH: "Сложно (Много мобов)", start: "НАЧАТЬ ИГРУ", build: "3 (Дерево) + ПКМ = Строить (10🪵). 4 = Топор", safe: "🛡️ В УКРЫТИИ", peace: "🕊️ ПЕРЕМИРИЕ", winT: "🏆 ПОБЕДА!", winB: "ИГРАТЬ СНОВА", rT: "🌟 ЛЕГЕНДАРНАЯ АЧИВКА! 🌟", rD: "ТЫ ПОЙМАЛ ПАСХАЛЬНОГО КРОЛИКА!", rB: "КРУТО!", resp: "Возродиться", score: "Счет:", ach1: "🥚 Первое яйцо", ach2: "🪓 Дровосек", ach3: "🎯 Снайпер", ach4: "🏠 Мастер-строитель", ach5: "🐇 Ловец кроликов", ach6: "🕊️ Мирный житель", ach7: "🏴‍☠️ Пират", ach8: "🥚 Счастливая Пасха!" },
+  en: { title: "🐰 EASTER EGG HUNT PRO 🐰", diffL: "Difficulty:", dE: "Easy (Peaceful)", dN: "Normal (Few mobs)", dH: "Hard (Many mobs)", start: "START GAME", build: "3 (Wood) + RMB = Build (10🪵). 4 = Axe", safe: "🛡️ SAFE ZONE", peace: "🕊️ PEACE", winT: "🏆 VICTORY!", winB: "PLAY AGAIN", rT: "🌟 LEGENDARY ACHIEVEMENT! 🌟", rD: "YOU CAUGHT THE EASTER BUNNY!", rB: "AWESOME!", resp: "Respawn", score: "Score:", ach1: "🥚 First Egg", ach2: "🪓 Woodcutter", ach3: "🎯 Sniper", ach4: "🏠 Master Builder", ach5: "🐇 Bunny Catcher", ach6: "🕊️ Pacifist", ach7: "🏴‍☠️ Pirate", ach8: "🥚 Happy Easter!" },
+  fr: { title: "🐰 CHASSE AUX OEUFS PRO 🐰", diffL: "Difficulté:", dE: "Facile (Pacifique)", dN: "Normal (Peu de monstres)", dH: "Difficile (Beaucoup de monstres)", start: "JOUER", build: "3 (Bois) + Clic Droit = Maison (10🪵). 4=Hache", safe: "🛡️ ZONE SÉCURISÉE", peace: "🕊️ PAIX", winT: "🏆 VICTOIRE!", winB: "REJOUER", rT: "🌟 SUCCÈS LÉGENDAIRE! 🌟", rD: "TU AS ATTRAPÉ LE LAPIN DE PÂQUES!", rB: "GÉNIAL!", resp: "Réapparaître", score: "Score final:", ach1: "🥚 Premier œuf", ach2: "🪓 Bûcheron", ach3: "🎯 Sniper", ach4: "🏠 Bâtisseur", ach5: "🐇 Chasseur de lapin", ach6: "🕊️ Pacifiste", ach7: "🏴‍☠️ Pirate", ach8: "🥚 Joyeuses Pâques!" },
+  de: { title: "🐰 OSTEREIERSUCHE PRO 🐰", diffL: "Schwierigkeit:", dE: "Leicht (Friedlich)", dN: "Normal (Wenige Mobs)", dH: "Schwer (Viele Mobs)", start: "START", build: "3 (Holz) + RMT = Haus bauen (10🪵). 4=Axt", safe: "🛡️ SICHERHEITSZONE", peace: "🕊️ FRIEDEN", winT: "🏆 SIEG!", winB: "NOCHMAL SPIELEN", rT: "🌟 LEGENDÄRER ERFOLG! 🌟", rD: "DU HAST DEN OSTERHASEN GEFANGEN!", rB: "GENIAL!", resp: "Wiederbeleben", score: "Punkte:", ach1: "🥚 Erstes Ei", ach2: "🪓 Holzfäller", ach3: "🎯 Scharfschütze", ach4: "🏠 Baumeister", ach5: "🐇 Hasenfänger", ach6: "🕊️ Pazifist", ach7: "🏴‍☠️ Pirat", ach8: "🥚 Frohe Ostern!" },
+  es: { title: "🐰 BÚSQUEDA DE HUEVOS PRO 🐰", diffL: "Dificultad:", dE: "Fácil (Pacífico)", dN: "Normal (Pocos mobs)", dH: "Difícil (Muchos mobs)", start: "EMPEZAR", build: "3 (Madera) + Click Der = Casa (10🪵). 4=Hacha", safe: "🛡️ ZONA SEGURA", peace: "🕊️ PAZ", winT: "🏆 ¡VICTORIA!", winB: "JUGAR DE NUEVO", rT: "🌟 ¡LOGRO LEGENDARIO! 🌟", rD: "¡ATRAPASTE AL CONEJO DE PASCUA!", rB: "¡GENIAL!", resp: "Reaparecer", score: "Puntuación:", ach1: "🥚 Primer Huevo", ach2: "🪓 Leñador", ach3: "🎯 Francotirador", ach4: "🏠 Constructor", ach5: "🐇 Cazador de conejos", ach6: "🕊️ Pacifista", ach7: "🏴‍☠️ Pirata", ach8: "🥚 ¡Felices Pascuas!" },
+  it: { title: "🐰 CACCIA ALLE UOVA PRO 🐰", diffL: "Difficoltà:", dE: "Facile (Pacifico)", dN: "Normale (Pochi mob)", dH: "Difficile (Molti mob)", start: "INIZIA GIOCO", build: "3 (Legno) + Tasto Destro = Casa (10🪵). 4=Ascia", safe: "🛡️ ZONA SICURA", peace: "🕊️ PACE", winT: "🏆 VITTORIA!", winB: "GIOCA ANCORA", rT: "🌟 OBIETTIVO LEGGENDARIO! 🌟", rD: "HAI PRESO IL CONIGLIO DI PASQUA!", rB: "FANTASTICO!", resp: "Rinasci", score: "Punteggio:", ach1: "🥚 Primo Uovo", ach2: "🪓 Taglialegna", ach3: "🎯 Cecchino", ach4: "🏠 Costruttore", ach5: "🐇 Cacciatore di conigli", ach6: "🕊️ Pacifista", ach7: "🏴‍☠️ Pirata", ach8: "🥚 Buona Pasqua!" },
+  ja: { title: "🐰 エッグハント PRO 🐰", diffL: "難易度:", dE: "簡単（平和）", dN: "普通（モブ少なめ）", dH: "難しい（モブ多い）", start: "ゲーム開始", build: "3 (木) + 右クリック = 家を建てる (10🪵). 4=斧", safe: "🛡️ 安全地帯", peace: "🕊️ 平和", winT: "🏆 勝利！", winB: "もう一度プレイ", rT: "🌟 伝説の実績！ 🌟", rD: "イースターバニーを捕まえた！", rB: "すごい！", resp: "リスポーン", score: "最終スコア:", ach1: "🥚 最初の卵", ach2: "🪓 木こり", ach3: "🎯 スナイパー", ach4: "🏠 建築家", ach5: "🐇 ウサギ捕り", ach6: "🕊️ 平和主義者", ach7: "🏴‍☠️ 海賊", ach8: "🥚 ハッピーイースター！" },
+  zh: { title: "🐰 寻找彩蛋 PRO 🐰", diffL: "难度:", dE: "简单（和平）", dN: "普通（少量怪物）", dH: "困难（大量怪物）", start: "开始游戏", build: "3 (木头) + 右键 = 建造房屋 (10🪵). 4=斧头", safe: "🛡️ 安全区", peace: "🕊️ 和平", winT: "🏆 胜利！", winB: "再玩一次", rT: "🌟 传奇成就！ 🌟", rD: "你抓住了复活节兔子！", rB: "太棒了！", resp: "重生", score: "最终得分:", ach1: "🥚 第一个蛋", ach2: "🪓 伐木工", ach3: "🎯 神枪手", ach4: "🏠 建筑师", ach5: "🐇 兔子猎人", ach6: "🕊️ 和平主义者", ach7: "🏴‍☠️ 海盗", ach8: "🥚 复活节快乐！" }
 };
 
 let currentLang = 'ru'; 
@@ -180,7 +181,7 @@ function setGameLanguage(lang) {
 }
 
 let scene, camera, renderer, weaponGroup, flash;
-let score = 0, health = 5, woodCount = 0, headshots = 0, builtBlocks = 0;
+let score = 0, health = 5, combo = 0, woodCount = 0, headshots = 0, builtBlocks = 0;
 let targets = [], particles = [], bonuses = [], items = [], houses = [], eggs = [];
 let move = { fwd: false, bwd: false, left: false, right: false, sprint: false, jump: false };
 let player = { vel: new THREE.Vector3(), onGround: false, height: 1.7, speed: 0 };
@@ -188,11 +189,10 @@ let pitch = 0, yaw = 0;
 let isDead = false, isQuizActive = false, gameStarted = false;
 let stepTimer = 0, swingProgress = 0, isSwinging = false;
 let currentWeaponType = 'gun';
-let inventory = ['gun', 'wood']; // Изначально только пушка и дерево (ресурс)
+let inventory = ['gun', 'wood']; 
 let peaceTimer = 10.0; 
 let rabbitObj = null;
 
-// Статистика для ачивок
 let myAchievements = new Set();
 let hitMobsCount = 0;
 let chestsOpened = 0;
@@ -208,7 +208,7 @@ const MOB_WORLD_CLAMP_MARGIN = 2.5;
 
 let levelData = { endMessage: "", eggs: [], language: "ru" };
 let eggsFound = 0, currentEggMesh = null;
-let textures = {}; // Текстуры будут загружены после старта
+let textures = {}; 
 
 const DATA_BASE_URL = "https://kgbgamelab.github.io/texts/data/";
 
@@ -268,72 +268,78 @@ function playSound(type) {
   }
 }
 
-function createTexture(type) {
+function createTexture(color1, color2) {
   const canvas = document.createElement('canvas'); canvas.width = 64; canvas.height = 64; const ctx = canvas.getContext('2d');
-  const fillNoise = (c) => { ctx.fillStyle = c; ctx.fillRect(0,0,64,64); for(let i=0; i<400; i++) { ctx.fillStyle=`rgba(0,0,0,0.1)`; ctx.fillRect(Math.random()*64,Math.random()*64,4,4); }};
-  if(type === 'grass_top') { fillNoise('#7CFC00'); ctx.fillStyle='#32CD32'; for(let i=0;i<50;i++) ctx.fillRect(Math.random()*60,Math.random()*60,4,4); } 
-  else if (type === 'wood') { ctx.fillStyle='#5c4033'; ctx.fillRect(0,0,64,64); ctx.fillStyle='#4a332a'; for(let i=1;i<4;i++) ctx.fillRect(i*16,0,4,64); }
-  else if (type === 'planks') { ctx.fillStyle='#a07040'; ctx.fillRect(0,0,64,64); ctx.fillStyle='#805020'; ctx.fillRect(0,0,64,2); ctx.fillRect(0,20,64,2); ctx.fillRect(0,40,64,2); }
-  else if (type === 'leaves') { fillNoise('#FFB7C5'); ctx.fillStyle='#FF69B4'; for(let i=0;i<60;i++) ctx.fillRect(Math.random()*60,Math.random()*60,6,6); } 
-  else if (type === 'chest') { ctx.fillStyle='#6d4e34'; ctx.fillRect(0,0,64,64); ctx.fillStyle='#000'; ctx.strokeRect(2,2,60,60); ctx.fillStyle='#FFD700'; ctx.fillRect(28,24,8,12); }
-  else if (type === 'skel_body') { ctx.fillStyle='#333'; ctx.fillRect(0,0,64,64); ctx.fillStyle='#ddd'; ctx.fillRect(28, 0, 8, 64); for(let i=10; i<50; i+=10) ctx.fillRect(10, i, 44, 4); }
-  else if (type === 'skel_face') { ctx.fillStyle='#ccc'; ctx.fillRect(0,0,64,64); ctx.fillStyle='#111'; ctx.fillRect(10,20,16,14); ctx.fillRect(38,20,16,14); ctx.fillRect(28,40,8,8); ctx.fillStyle='#555'; ctx.fillRect(10,55,44,4); }
-  const tex = new THREE.CanvasTexture(canvas); tex.magFilter = THREE.NearestFilter; return tex;
+  ctx.fillStyle = color1; ctx.fillRect(0,0,64,64);
+  ctx.fillStyle = color2; for(let i=0;i<50;i++) ctx.fillRect(Math.random()*60,Math.random()*60,4,4);
+  return new THREE.CanvasTexture(canvas);
 }
 
-function generateEggTexture(baseColor) {
-  const c = document.createElement('canvas'); c.width=64; c.height=64; const ctx = c.getContext('2d');
-  ctx.fillStyle = baseColor.getStyle(); ctx.fillRect(0,0,64,64);
-  ctx.fillStyle = 'rgba(255,255,255,0.8)'; for(let i=0; i<8; i++) { ctx.beginPath(); ctx.arc(Math.random()*64, Math.random()*64, 3+Math.random()*4, 0, Math.PI*2); ctx.fill(); }
-  ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.fillRect(0, 15, 64, 5); ctx.fillRect(0, 45, 64, 5);
-  const tex = new THREE.CanvasTexture(c); tex.magFilter = THREE.NearestFilter; return tex;
-}
-
-// Изменена инициализация чтобы не было черного экрана
 function startGame() {
-  document.getElementById('start-game-btn').innerText = "ЗАГРУЗКА...";
-  
-  // Генерируем текстуры после клика, чтобы страница грузилась быстро
+  difficulty = document.getElementById('diff-select').value;
+  const btn = document.getElementById('start-game-btn');
+  btn.innerText = "ЗАГРУЗКА...";
+  btn.disabled = true;
+
   setTimeout(() => {
-    textures.grass = createTexture('grass_top'); textures.wood = createTexture('wood'); textures.planks = createTexture('planks');
-    textures.leaves = createTexture('leaves'); textures.chest = createTexture('chest'); textures.skel_body = createTexture('skel_body'); textures.skel_face = createTexture('skel_face');
-    
-    difficulty = document.getElementById('diff-select').value;
-    document.getElementById('start-screen').style.display = 'none';
-    document.getElementById('hud').style.display = 'block';
-    
-    if(audioCtx.state === 'suspended') audioCtx.resume();
-    document.body.requestPointerLock();
-    
-    init(); updateUI(); gameStarted = true;
-  }, 50);
+      textures.grass = createTexture('#7CFC00', '#32CD32');
+      textures.wood = createTexture('#5c4033', '#4a332a');
+      textures.planks = createTexture('#a07040', '#805020');
+      textures.leaves = createTexture('#FFB7C5', '#FF69B4');
+      textures.chest = createTexture('#6d4e34', '#000000');
+      textures.skel_body = createTexture('#333333', '#dddddd');
+      textures.skel_face = createTexture('#cccccc', '#111111');
+      textures.face = createTexture('#bcaea5', '#222222');
+      
+      document.getElementById('start-screen').style.display = 'none';
+      document.getElementById('hud').style.display = 'block';
+      gameStarted = true;
+      if(audioCtx.state === 'suspended') audioCtx.resume();
+      init();
+      document.body.requestPointerLock();
+  }, 100);
 }
 
 function init() {
   scene = new THREE.Scene(); scene.background = new THREE.Color(0x00BFFF); scene.fog = new THREE.Fog(0x00BFFF, 20, 100);
-  camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 1000); camera.rotation.order = 'YXZ';
+  camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 1000); camera.rotation.order='YXZ';
   weaponGroup = new THREE.Group(); scene.add(weaponGroup);
+  renderer = new THREE.WebGLRenderer({ antialias: true }); renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
 
-  renderer = new THREE.WebGLRenderer({ antialias: false }); renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; document.body.appendChild(renderer.domElement);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+  const sun = new THREE.DirectionalLight(0xffffff, 1.0); sun.position.set(50, 100, 50); scene.add(sun);
 
-  scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-  const sun = new THREE.DirectionalLight(0xffffff, 1.0); sun.position.set(50, 100, 50); sun.castShadow = true; scene.add(sun);
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), new THREE.MeshLambertMaterial({map: textures.grass}));
+  floor.rotation.x = -Math.PI/2; scene.add(floor);
 
-  createWorld(); setWeapon('gun'); spawnLoot(); spawnEggs();
+  let mCount = difficulty === 'hard' ? 15 : (difficulty === 'normal' ? 7 : 0);
+  for(let i=0; i<mCount; i++) {
+    const m = createMob(); m.position.set(Math.random()*200-100, 0, Math.random()*200-100);
+    targets.push({obj: m}); scene.add(m);
+  }
+
+  for(let i=0; i<30; i++) {
+    const tr = new THREE.Group(); tr.userData = {isTree:true, hp:3};
+    const trunk = new THREE.Mesh(new THREE.BoxGeometry(1, 5, 1), new THREE.MeshLambertMaterial({map: textures.wood})); trunk.position.y=2.5;
+    const leaves = new THREE.Mesh(new THREE.BoxGeometry(4, 4, 4), new THREE.MeshLambertMaterial({color: 0xFFB7C5})); leaves.position.y=6;
+    tr.add(trunk, leaves); tr.position.set(Math.random()*200-100, 0, Math.random()*200-100); scene.add(tr);
+  }
+
+  spawnLoot();
+  spawnRabbit();
+  spawnEggs();
+  setWeapon('gun');
 
   document.addEventListener('keydown', e => {
     if(!gameStarted || isDead || isQuizActive) return;
     if(e.key === '1') setWeapon('gun');
     if(e.key === '2' && inventory.includes('sword')) setWeapon('sword');
-    if(e.key === '3') setWeapon('wood'); // Дерево (Стройка)
-    if(e.key === '4' && inventory.includes('axe')) setWeapon('axe'); // Топор (Рубить)
-    
-    if(e.code === 'Space') move.jump = true; 
-    if(e.code === 'ShiftLeft') move.sprint = true;
+    if(e.key === '3') setWeapon('wood');
+    if(e.key === '4' && inventory.includes('axe')) setWeapon('axe');
+    if(e.code === 'Space') move.jump = true; if(e.code === 'ShiftLeft') move.sprint = true;
     handleKeys(e.code, true);
   });
-  
   document.addEventListener('keyup', e => {
     if(e.code === 'Space') move.jump = false; if(e.code === 'ShiftLeft') move.sprint = false;
     handleKeys(e.code, false);
@@ -347,40 +353,14 @@ function init() {
   });
   document.addEventListener('contextmenu', e => { e.preventDefault(); buildHouse(e); });
   
-  document.addEventListener('mousemove', onMouseMove);
-  window.addEventListener('resize', () => { camera.aspect=window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+  document.addEventListener('mousemove', e => {
+    if(document.pointerLockElement) { yaw -= e.movementX*0.003; pitch -= e.movementY*0.003; pitch = Math.max(-1.5, Math.min(1.5, pitch)); camera.rotation.set(pitch, yaw, 0); }
+  });
   animate();
 }
 
-function createWorld() {
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), new THREE.MeshLambertMaterial({map: textures.grass}));
-  floor.rotation.x = -Math.PI/2; floor.receiveShadow = true; floor.material.map.wrapS = floor.material.map.wrapT = THREE.RepeatWrapping; floor.material.map.repeat.set(100, 100); scene.add(floor);
-
-  for(let i=0; i<150; i++) {
-    const f = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), new THREE.MeshBasicMaterial({color: [0xff0000, 0xffff00, 0xff00ff, 0xffffff][Math.floor(Math.random()*4)]}));
-    f.position.set(Math.random()*200-100, 0.15, Math.random()*200-100); scene.add(f);
-  }
-
-  createHouse(20, 0, 20); createHouse(-30, 0, -30); createHouse(40, 0, -10);
-
-  for(let i=0; i<40; i++) {
-    const x = Math.random()*200-100; const z = Math.random()*200-100;
-    let tooClose = false; houses.forEach(h => { if(new THREE.Vector3(x,0,z).distanceTo(new THREE.Vector3(h.bounds.minX, 0, h.bounds.minZ)) < 8) tooClose = true; });
-    if(!tooClose && (Math.abs(x)>10 || Math.abs(z)>10)) createTree(x, z);
-  }
-
-  let mobCount = difficulty === 'hard' ? 15 : (difficulty === 'normal' ? 7 : 0);
-  for(let i=0; i<mobCount; i++) {
-    const type = Math.random()>0.5?'zombie':'skeleton';
-    const m = createMob(type, type); m.position.set(Math.random()*100-50, 0, Math.random()*100-50);
-    m.userData.home = m.position.clone(); scene.add(m); targets.push({obj: m});
-  }
-  
-  createRabbit(); // ✅ Кролик из примитивов
-}
-
-// ✅ ИДЕАЛЬНЫЙ БЕЛЫЙ КРОЛИК ИЗ ПРИМИТИВОВ (Лицо по оси +Z)
-function createRabbit() {
+// ✅ ПРАВИЛЬНЫЙ БЕЛЫЙ КРОЛИК ИЗ ПРИМИТИВОВ (Лицо по оси +Z)
+function spawnRabbit() {
   const grp = new THREE.Group();
   const mat = new THREE.MeshLambertMaterial({color: 0xffffff}); // 100% БЕЛЫЙ
   
@@ -404,90 +384,6 @@ function createRabbit() {
   grp.add(body, head, tail, legFL, legFR, legBL, legBR);
   grp.userData = { isRabbit: true, vel: new THREE.Vector3(), timer: 0, parts: {earL, earR, legBL, legBR} };
   grp.position.set(10, 0, 10); scene.add(grp); rabbitObj = grp;
-}
-
-function createHouse(x, y, z) {
-  const grp = new THREE.Group();
-  const wallMat = new THREE.MeshLambertMaterial({map: textures.wood}); const floorMat = new THREE.MeshLambertMaterial({map: textures.planks});
-  const floor = new THREE.Mesh(new THREE.BoxGeometry(7, 0.2, 7), floorMat); floor.position.y = 0.1; grp.add(floor);
-  const w1 = new THREE.Mesh(new THREE.BoxGeometry(7, 4, 0.5), wallMat); w1.position.set(0,2,-3.5); grp.add(w1);
-  const w2 = new THREE.Mesh(new THREE.BoxGeometry(7, 4, 0.5), wallMat); w2.position.set(0,2,3.5); grp.add(w2);
-  const w3 = new THREE.Mesh(new THREE.BoxGeometry(0.5, 4, 7), wallMat); w3.position.set(-3.5,2,0); grp.add(w3);
-  const w4a = new THREE.Mesh(new THREE.BoxGeometry(0.5, 4, 2.5), wallMat); w4a.position.set(3.5,2,-2.25); grp.add(w4a);
-  const w4b = new THREE.Mesh(new THREE.BoxGeometry(0.5, 4, 2.5), wallMat); w4b.position.set(3.5,2,2.25); grp.add(w4b);
-  const roof = new THREE.Mesh(new THREE.ConeGeometry(6, 3, 4), new THREE.MeshLambertMaterial({color: 0x5a3a22})); roof.position.y = 5.5; roof.rotation.y = Math.PI/4; grp.add(roof);
-  grp.position.set(x, y, z); scene.add(grp);
-  houses.push({ hp: 999, bounds: { minX: x - 3.8, maxX: x + 3.8, minZ: z - 3.8, maxZ: z + 3.8 } });
-}
-
-function createTree(x, z) {
-  const group = new THREE.Group(); group.userData = { isTree: true, hp: 3 };
-  const trunk = new THREE.Mesh(new THREE.BoxGeometry(1, 5, 1), new THREE.MeshLambertMaterial({map: textures.wood})); trunk.position.y = 2.5; trunk.castShadow = true;
-  const leafGeo = new THREE.BoxGeometry(1, 1, 1); const leafMat = new THREE.MeshLambertMaterial({map: textures.leaves, color: 0xFFB7C5});
-  for(let lx=-2; lx<=2; lx++) for(let ly=0; ly<=2; ly++) for(let lz=-2; lz<=2; lz++)
-    if(Math.abs(lx)+Math.abs(ly)+Math.abs(lz) < 4) { const l = new THREE.Mesh(leafGeo, leafMat); l.position.set(lx, 4+ly, lz); group.add(l); }
-  group.add(trunk); group.position.set(x, 0, z); scene.add(group);
-}
-
-function spawnEggs() {
-  const geo = new THREE.SphereGeometry(0.6, 16, 16); geo.scale(1, 1.3, 1);
-  levelData.eggs.forEach(task => {
-    const color = new THREE.Color().setHSL(Math.random(), 1, 0.6);
-    const mat = new THREE.MeshStandardMaterial({map: generateEggTexture(color), roughness: 0.2, emissive: color, emissiveIntensity: 0.2});
-    const mesh = new THREE.Mesh(geo, mat); mesh.position.set(Math.random()*160-80, 0.7, Math.random()*160-80);
-    mesh.userData = { isEgg: true, task: task, baseColor: color }; scene.add(mesh); eggs.push(mesh);
-    const light = new THREE.PointLight(color, 1.5, 5); light.position.y = 1; mesh.add(light);
-  });
-}
-
-// ✅ ОБНОВЛЕННЫЙ ИНВЕНТАРЬ
-function setWeapon(type) {
-  currentWeaponType = type; weaponGroup.clear(); 
-  document.querySelectorAll('.slot').forEach(s => s.classList.remove('active'));
-  
-  if(type === 'gun') { document.getElementById('slot-0').classList.add('active'); }
-  if(type === 'sword') { document.getElementById('slot-1').classList.add('active'); }
-  if(type === 'wood') { document.getElementById('slot-2').classList.add('active'); }
-  if(type === 'axe') { document.getElementById('slot-3').classList.add('active'); }
-
-  if(type==='gun') {
-      const body = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.8), new THREE.MeshLambertMaterial({color: 0x333}));
-      flash = new THREE.PointLight(0xffaa00, 0, 4); flash.position.z = -1; weaponGroup.add(body, flash);
-      weaponGroup.userData = { offset: new THREE.Vector3(0.4, -0.4, -0.6) };
-  } else if (type === 'sword') {
-      const blade = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.8, 0.05), new THREE.MeshLambertMaterial({color: 0x88ccff})); blade.position.y = 0.5;
-      const handle = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.3, 0.08), new THREE.MeshLambertMaterial({color: 0x5c4033})); handle.position.y = -0.1;
-      weaponGroup.add(blade, handle); weaponGroup.userData = { offset: new THREE.Vector3(0.5, -0.5, -0.8) };
-  } else if (type === 'wood') {
-      const woodBlock = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.4), new THREE.MeshLambertMaterial({map: textures.planks}));
-      weaponGroup.add(woodBlock); weaponGroup.userData = { offset: new THREE.Vector3(0.5, -0.5, -0.8) };
-  } else if (type === 'axe') {
-      const handle = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.6, 0.05), new THREE.MeshLambertMaterial({color: 0x5c4033})); handle.position.y = 0.2;
-      const head = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.2, 0.1), new THREE.MeshLambertMaterial({color: 0x777777})); head.position.set(0.1, 0.4, 0);
-      weaponGroup.add(handle, head); weaponGroup.userData = { offset: new THREE.Vector3(0.5, -0.5, -0.8) };
-  }
-}
-
-function spawnLoot() {
-  const chestGeo = new THREE.BoxGeometry(0.8, 0.8, 0.8); const chestMat = new THREE.MeshLambertMaterial({map: textures.chest});
-  for(let i=0; i<8; i++) { const b = new THREE.Mesh(chestGeo, chestMat); b.position.set(Math.random()*160-80, 0.4, Math.random()*160-80); b.userData = { type: 'chest' }; scene.add(b); bonuses.push(b); }
-  
-  // Спавним мечи
-  for(let i=0; i<3; i++) {
-      const sword = new THREE.Group();
-      const blade = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.8, 0.05), new THREE.MeshLambertMaterial({color: 0x88ccff})); const handle = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.3, 0.08), new THREE.MeshLambertMaterial({color: 0x5c4033}));
-      blade.position.y=0.4; handle.position.y=-0.15; sword.add(blade, handle);
-      sword.position.set(Math.random()*80-40, 0.5, Math.random()*80-40); sword.rotation.z = Math.PI/2; sword.userData = { type: 'sword_item' }; scene.add(sword); items.push(sword);
-  }
-
-  // Спавним топоры
-  for(let i=0; i<3; i++) {
-      const axe = new THREE.Group();
-      const handle = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.6, 0.05), new THREE.MeshLambertMaterial({color: 0x5c4033})); handle.position.y = 0.2;
-      const head = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.2, 0.1), new THREE.MeshLambertMaterial({color: 0x777777})); head.position.set(0.1, 0.4, 0);
-      axe.add(handle, head);
-      axe.position.set(Math.random()*80-40, 0.5, Math.random()*80-40); axe.rotation.z = Math.PI/2; axe.userData = { type: 'axe_item' }; scene.add(axe); items.push(axe);
-  }
 }
 
 function createMob() {
@@ -514,10 +410,91 @@ function createMob() {
   return mob;
 }
 
+function createHouse(x, y, z) {
+  const grp = new THREE.Group();
+  const wallMat = new THREE.MeshLambertMaterial({map: textures.wood}); const floorMat = new THREE.MeshLambertMaterial({map: textures.planks});
+  const floor = new THREE.Mesh(new THREE.BoxGeometry(7, 0.2, 7), floorMat); floor.position.y = 0.1; grp.add(floor);
+  const w1 = new THREE.Mesh(new THREE.BoxGeometry(7, 4, 0.5), wallMat); w1.position.set(0,2,-3.5); grp.add(w1);
+  const w2 = new THREE.Mesh(new THREE.BoxGeometry(7, 4, 0.5), wallMat); w2.position.set(0,2,3.5); grp.add(w2);
+  const w3 = new THREE.Mesh(new THREE.BoxGeometry(0.5, 4, 7), wallMat); w3.position.set(-3.5,2,0); grp.add(w3);
+  const w4a = new THREE.Mesh(new THREE.BoxGeometry(0.5, 4, 2.5), wallMat); w4a.position.set(3.5,2,-2.25); grp.add(w4a);
+  const w4b = new THREE.Mesh(new THREE.BoxGeometry(0.5, 4, 2.5), wallMat); w4b.position.set(3.5,2,2.25); grp.add(w4b);
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(6, 3, 4), new THREE.MeshLambertMaterial({color: 0x5a3a22})); roof.position.y = 5.5; roof.rotation.y = Math.PI/4; grp.add(roof);
+  grp.position.set(x, y, z); scene.add(grp);
+  houses.push({ hp: 999, bounds: { minX: x - 3.8, maxX: x + 3.8, minZ: z - 3.8, maxZ: z + 3.8 } });
+}
+
+function generateEggTexture(baseColor) {
+  const c = document.createElement('canvas'); c.width=64; c.height=64; const ctx = c.getContext('2d');
+  ctx.fillStyle = baseColor.getStyle(); ctx.fillRect(0,0,64,64);
+  ctx.fillStyle = 'rgba(255,255,255,0.8)'; for(let i=0; i<8; i++) { ctx.beginPath(); ctx.arc(Math.random()*64, Math.random()*64, 3+Math.random()*4, 0, Math.PI*2); ctx.fill(); }
+  ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.fillRect(0, 15, 64, 5); ctx.fillRect(0, 45, 64, 5);
+  const tex = new THREE.CanvasTexture(c); tex.magFilter = THREE.NearestFilter; return tex;
+}
+
+function spawnEggs() {
+  const geo = new THREE.SphereGeometry(0.6, 16, 16); geo.scale(1, 1.3, 1);
+  levelData.eggs.forEach(task => {
+    const color = new THREE.Color().setHSL(Math.random(), 1, 0.6);
+    const mat = new THREE.MeshStandardMaterial({map: generateEggTexture(color), roughness: 0.2, emissive: color, emissiveIntensity: 0.2});
+    const mesh = new THREE.Mesh(geo, mat); mesh.position.set(Math.random()*160-80, 0.7, Math.random()*160-80);
+    mesh.userData = { isEgg: true, task: task, baseColor: color }; scene.add(mesh); eggs.push(mesh);
+    const light = new THREE.PointLight(color, 1.5, 5); light.position.y = 1; mesh.add(light);
+  });
+}
+
+function setWeapon(type) {
+  currentWeaponType = type; weaponGroup.clear(); 
+  document.querySelectorAll('.slot').forEach((s, i) => {
+      s.classList.remove('active');
+      if(type === 'gun' && i === 0) s.classList.add('active');
+      if(type === 'sword' && i === 1) s.classList.add('active');
+      if(type === 'wood' && i === 2) s.classList.add('active');
+      if(type === 'axe' && i === 3) s.classList.add('active');
+  });
+
+  if(type==='gun') {
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.8), new THREE.MeshLambertMaterial({color: 0x333}));
+      flash = new THREE.PointLight(0xffaa00, 0, 4); flash.position.z = -1; weaponGroup.add(body, flash);
+      weaponGroup.userData = { offset: new THREE.Vector3(0.4, -0.4, -0.6) };
+  } else if (type === 'sword') {
+      const blade = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.8, 0.05), new THREE.MeshLambertMaterial({color: 0x88ccff})); blade.position.y = 0.5;
+      const handle = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.3, 0.08), new THREE.MeshLambertMaterial({color: 0x5c4033})); handle.position.y = -0.1;
+      weaponGroup.add(blade, handle); weaponGroup.userData = { offset: new THREE.Vector3(0.5, -0.5, -0.8) };
+  } else if (type === 'wood') {
+      const woodBlock = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.4), new THREE.MeshLambertMaterial({map: textures.planks}));
+      weaponGroup.add(woodBlock); weaponGroup.userData = { offset: new THREE.Vector3(0.5, -0.5, -0.8) };
+  } else if (type === 'axe') {
+      const handle = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.6, 0.05), new THREE.MeshLambertMaterial({color: 0x5c4033})); handle.position.y = 0.2;
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.2, 0.1), new THREE.MeshLambertMaterial({color: 0x777777})); head.position.set(0.1, 0.4, 0);
+      weaponGroup.add(handle, head); weaponGroup.userData = { offset: new THREE.Vector3(0.5, -0.5, -0.8) };
+  }
+}
+
+function spawnLoot() {
+  for(let i=0; i<8; i++) { 
+      const b = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), new THREE.MeshLambertMaterial({color: 0xFFD700})); 
+      b.position.set(Math.random()*160-80, 0.4, Math.random()*160-80); b.userData = { type: 'chest' }; scene.add(b); bonuses.push(b); 
+  }
+  for(let i=0; i<3; i++) {
+      const sword = new THREE.Group();
+      const blade = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.8, 0.05), new THREE.MeshLambertMaterial({color: 0x88ccff})); const handle = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.3, 0.08), new THREE.MeshLambertMaterial({color: 0x5c4033}));
+      blade.position.y=0.4; handle.position.y=-0.15; sword.add(blade, handle);
+      sword.position.set(Math.random()*80-40, 0.5, Math.random()*80-40); sword.rotation.z = Math.PI/2; sword.userData = { type: 'sword_item' }; scene.add(sword); items.push(sword);
+  }
+  for(let i=0; i<3; i++) {
+      const axe = new THREE.Group();
+      const handle = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.6, 0.05), new THREE.MeshLambertMaterial({color: 0x5c4033})); handle.position.y = 0.2;
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.2, 0.1), new THREE.MeshLambertMaterial({color: 0x777777})); head.position.set(0.1, 0.4, 0);
+      axe.add(handle, head);
+      axe.position.set(Math.random()*80-40, 0.5, Math.random()*80-40); axe.rotation.z = Math.PI/2; axe.userData = { type: 'axe_item' }; scene.add(axe); items.push(axe);
+  }
+}
+
 function unlockAch(id) {
   if(!myAchievements.has(id)) {
     myAchievements.add(id);
-    spawnFloatingText(camera.position.x, camera.position.y + 1, camera.position.z, "🏆 ACHIEVEMENT!", "gold");
+    spawnFloatingText(camera.position.x, camera.position.y + 1, camera.position.z, i18nEngine[currentLang][id], "gold");
     playSound('heal');
   }
 }
@@ -543,22 +520,18 @@ function checkGunsmith() {
     if(inventory.includes('sword') && inventory.includes('axe')) unlockAch('achWeapon');
 }
 
-// ✅ ПОСТРОЙКА ПОЛНОЦЕННОГО ДОМА (СМЕЩЕНО ВПЕРЕД, ЧТОБЫ НЕ ЗАСТРЯТЬ)
+// ✅ ПОСТРОЙКА ДОМА (РАБОТАЕТ ТОЛЬКО С ДЕРЕВОМ НА ПКМ)
 function buildHouse(e) {
   if(e) e.preventDefault();
   if(!gameStarted || isDead || isQuizActive || woodCount < 10 || currentWeaponType !== 'wood') return; 
   
-  const dir = new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion);
-  dir.y = 0; dir.normalize();
-  
-  // Ставим дом на 12 блоков вперед от камеры
-  const spawnPos = camera.position.clone().add(dir.multiplyScalar(12));
-  spawnPos.y = 0; 
+  const dir = new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion); dir.y = 0; dir.normalize();
+  const spawnPos = camera.position.clone().add(dir.multiplyScalar(10)); spawnPos.y = 0; 
   
   createHouse(spawnPos.x, spawnPos.y, spawnPos.z);
   woodCount -= 10; builtBlocks++; updateUI(); playSound('step');
   
-  if(builtBlocks >= 1) unlockAch('ach4'); // Строитель
+  if(builtBlocks >= 1) unlockAch('achBuild'); 
 }
 
 function attack(e) {
@@ -587,11 +560,12 @@ function attack(e) {
         if (root.userData.hp <= 0) { 
             scene.remove(root); woodCount += 3; updateUI(); 
             spawnFloatingText(root.position.x, root.position.y+3, root.position.z, "+3 🪵", "#deb887"); 
+            if(woodCount >= 30) unlockAch('ach2'); // Дровосек
         } return;
     }
     
     if (root.userData.isRabbit) { 
-        playSound('music'); scene.remove(root); rabbitObj = null; unlockAch('ach5'); 
+        playSound('music'); scene.remove(root); rabbitObj = null; unlockAch('achRabbit'); 
         document.exitPointerLock(); document.getElementById('rabbit-screen').style.display = 'flex'; return; 
     }
     
@@ -600,14 +574,14 @@ function attack(e) {
       chestsOpened++;
       if (Math.random() > 0.5) { healPlayer(); spawnFloatingText(root.position.x, root.position.y, root.position.z, "+1 ❤️", "#ff0000"); }
       else { score += 200; spawnFloatingText(root.position.x, root.position.y, root.position.z, "+200 XP", "#ffff00"); }
-      if(chestsOpened >= 8) unlockAch('achPirate'); // Ачивка Пират
+      if(chestsOpened >= 8) unlockAch('achPirate'); // Пират
       updateUI(); spawnParticles(root.position, 0xffff00); return; 
     }
     
     if(items.includes(root)) { 
         playSound('loot'); scene.remove(root); items = items.filter(i => i !== root); 
-        if(root.userData.type === 'sword_item') { inventory.push('sword'); document.getElementById('slot-1').style.display = 'flex'; } 
-        if(root.userData.type === 'axe_item') { inventory.push('axe'); document.getElementById('slot-3').style.display = 'flex'; } 
+        if(root.userData.type === 'sword_item') { inventory.push('sword'); document.getElementById('slot-1').classList.add('owned'); } 
+        if(root.userData.type === 'axe_item') { inventory.push('axe'); document.getElementById('slot-3').classList.add('owned'); } 
         checkGunsmith();
         return; 
     }
@@ -618,7 +592,7 @@ function attack(e) {
     if(target) {
       target.obj.userData.isAggro = true; target.obj.userData.aggroTimer = 10;
       let isHeadshot = hit.userData.isHead; let damage = isHeadshot ? 3 : 1; target.obj.userData.hp -= damage;
-      hitMobsCount++; // Отменяет ачивку пацифиста
+      hitMobsCount++; // Отменяет пацифиста
       
       if(isHeadshot) {
           headshots++; spawnFloatingText(target.obj.position.x, target.obj.position.y+1, target.obj.position.z, "HEADSHOT!", "#ff0000");
@@ -633,15 +607,7 @@ function attack(e) {
   }
 }
 
-function pixelExplosion(pos, color) {
-  for(let i=0; i<40; i++) {
-    const p = new THREE.Mesh(new THREE.BoxGeometry(0.2,0.2,0.2), new THREE.MeshBasicMaterial({color: color}));
-    p.position.copy(pos); p.position.y += Math.random(); scene.add(p);
-    particles.push({m:p, v: new THREE.Vector3((Math.random()-.5)*0.5, Math.random()*0.3, (Math.random()-.5)*0.5)});
-  }
-}
-
-// ✅ ИСПРАВЛЕННЫЙ ПАРСЕР КАРТИНОК ДЛЯ КВИЗА
+// ✅ ПАРСЕР КАРТИНОК ИЗ [URL] ИЛИ ПРОСТО ПО ССЫЛКЕ
 function openQuiz(eggMesh) {
   isQuizActive = true; currentEggMesh = eggMesh; document.exitPointerLock();
   const task = eggMesh.userData.task;
@@ -650,12 +616,11 @@ function openQuiz(eggMesh) {
   let qText = task.question;
   let finalImgUrl = task.img || "";
 
-  // Вырезаем любую ссылку из текста вопроса []
   let imgMatch = qText.match(/\[(.*?)\]/);
   if(imgMatch) {
       finalImgUrl = imgMatch[1];
       qText = qText.replace(imgMatch[0], '').trim();
-  } else if (qText.startsWith("http")) { // Если весь вопрос это ссылка
+  } else if (qText.startsWith("http")) { 
       finalImgUrl = qText;
       qText = "Вопрос:";
   }
@@ -684,7 +649,7 @@ function checkAnswer(btnEl, selected, correct) {
   document.querySelectorAll('.ans-btn').forEach(b => b.disabled = true);
   if(selected === correct) {
     playSound('heal'); btnEl.classList.add('correct'); eggsFound++; score += 500; updateUI();
-    unlockAch('ach1'); // Ачивка Первое Яйцо
+    unlockAch('ach1'); // Первое Яйцо
     pixelExplosion(currentEggMesh.position, currentEggMesh.userData.baseColor);
     scene.remove(currentEggMesh); eggs = eggs.filter(e => e !== currentEggMesh);
   } else { playSound('wrong'); btnEl.classList.add('wrong'); }
@@ -696,7 +661,7 @@ function checkAnswer(btnEl, selected, correct) {
   }, 1500);
 }
 
-// ✅ ФИНАЛЬНЫЙ ЭКРАН С ПОДСЧЕТОМ И АЧИВКАМИ
+// ✅ ФИНАЛЬНЫЙ ЭКРАН
 function finishGame() {
   document.exitPointerLock(); playSound('music');
   
@@ -706,7 +671,7 @@ function finishGame() {
   document.getElementById('win-msg').innerText = levelData.endMessage || (i18nEngine[currentLang] ? i18nEngine[currentLang].winT : "С Праздником!");
   document.getElementById('final-score').innerText = `${i18nEngine[currentLang].score} ${score}`;
   
-  const list = document.getElementById('achievements-list'); list.innerHTML = '';
+  const list = document.getElementById('achievements-container'); list.innerHTML = '';
   myAchievements.forEach(id => {
       const badge = document.createElement('div');
       badge.className = 'ach-badge';
@@ -728,14 +693,6 @@ function updateUI() {
 function checkHouseProtection(pos) {
   for(let h of houses) { if (h.bounds && pos.x > h.bounds.minX + 0.5 && pos.x < h.bounds.maxX - 0.5 && pos.z > h.bounds.minZ + 0.5 && pos.z < h.bounds.maxZ - 0.5) return h; }
   return null;
-}
-
-function spawnParticles(pos, color, isHeart = false) {
-  for(let i=0; i<10; i++) {
-    let p; if(isHeart) { const heart = new THREE.Sprite(new THREE.SpriteMaterial({map: heartTexture, color: 0xffffff})); heart.scale.set(0.5, 0.5, 1); p = heart; } 
-    else { p = new THREE.Mesh(new THREE.BoxGeometry(0.15,0.15,0.15), new THREE.MeshBasicMaterial({color: color})); }
-    p.position.copy(pos); scene.add(p); particles.push({m:p, v: new THREE.Vector3((Math.random()-.5)*0.5, Math.random()*0.5, (Math.random()-.5)*0.5)});
-  }
 }
 
 function handleKeys(code, state) { if(code === 'KeyW') move.fwd = state; if(code === 'KeyS') move.bwd = state; if(code === 'KeyA') move.left = state; if(code === 'KeyD') move.right = state; }
@@ -805,7 +762,7 @@ function animate() {
       }
       rabbitObj.position.add(rabbitObj.userData.vel.clone().multiplyScalar(delta)); 
       
-      // Идеальный поворот кролика лицом (+Z) к вектору движения
+      // Поворот кролика лицом (+Z) к вектору движения
       if(rabbitObj.userData.vel.lengthSq() > 0.1) {
           rabbitObj.rotation.y = Math.atan2(rabbitObj.userData.vel.x, rabbitObj.userData.vel.z);
       }
