@@ -72,6 +72,19 @@
       background: rgba(255, 215, 0, 0.9); z-index: 1002; pointer-events: auto; text-align: center;
     }
 
+    /* PS-STYLE ACHIEVEMENT POPUP */
+    #achievement-popup {
+      position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
+      background: rgba(15, 15, 20, 0.95); border: 1px solid #444; border-radius: 12px;
+      padding: 15px 25px; display: flex; align-items: center; gap: 15px;
+      color: white; font-family: 'Montserrat', sans-serif; box-shadow: 0 5px 20px rgba(0,0,0,0.6);
+      z-index: 3000; transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none;
+    }
+    .ach-icon { font-size: 35px; }
+    .ach-text-container { display: flex; flex-direction: column; text-align: left; }
+    .ach-header { font-size: 11px; color: #aaa; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
+    .ach-name { font-size: 18px; color: #fff; font-weight: bold; margin-top: 2px;}
+
     .float-text {
       position: absolute; color: #ffff55; font-size: 40px; font-weight: bold;
       text-shadow: 3px 3px 0 #000; pointer-events: none;
@@ -143,6 +156,14 @@
       <div class="slot locked" id="slot-2">🪓</div>
       <div class="slot" id="slot-3">🪵</div>
     </div>
+  </div>
+</div>
+
+<div id="achievement-popup">
+  <div class="ach-icon">🏆</div>
+  <div class="ach-text-container">
+    <span class="ach-header">Achievement Unlocked</span>
+    <span class="ach-name" id="ach-popup-name">Name</span>
   </div>
 </div>
 
@@ -468,7 +489,8 @@ function setWeapon(type) {
   } else if (type === 'axe') {
       document.getElementById('slot-2').classList.add('active');
       const handle = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.6, 0.06), new THREE.MeshLambertMaterial({map: textures.wood})); handle.position.y = 0.2;
-      const headGeo = new THREE.BoxGeometry(0.1, 0.3, 0.4); headGeo.translate(0, 0.4, 0.1);
+      // Острие направлено от игрока
+      const headGeo = new THREE.BoxGeometry(0.1, 0.3, 0.4); headGeo.translate(0, 0.4, -0.15);
       const head = new THREE.Mesh(headGeo, new THREE.MeshLambertMaterial({color: 0x777777}));
       weaponGroup.add(handle, head); weaponGroup.userData = { offset: new THREE.Vector3(0.5, -0.5, -0.8) };
   } else if (type === 'wood') {
@@ -489,7 +511,8 @@ function spawnLoot() {
 
   const axe = new THREE.Group();
   const aHandle = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.6, 0.06), new THREE.MeshLambertMaterial({color: 0x5c4033}));
-  const aHeadGeo = new THREE.BoxGeometry(0.1, 0.3, 0.4); aHeadGeo.translate(0, 0.2, 0.1);
+  // Острие направлено от игрока
+  const aHeadGeo = new THREE.BoxGeometry(0.1, 0.3, 0.4); aHeadGeo.translate(0, 0.2, -0.15);
   const aHead = new THREE.Mesh(aHeadGeo, new THREE.MeshLambertMaterial({color: 0x777777}));
   axe.add(aHandle, aHead);
   axe.position.set(-5, 0.5, 5); axe.rotation.z = Math.PI/2; axe.userData = { type: 'axe_item' }; scene.add(axe); items.push(axe);
@@ -519,11 +542,16 @@ function createMob(text, type) {
   return mob;
 }
 
+// ✅ АЧИВКИ СТИЛЯ PLAYSTATION
 function unlockAch(id) {
   if(!myAchievements.has(id)) {
     myAchievements.add(id);
-    spawnFloatingText(camera.position.x, camera.position.y + 1, camera.position.z, "🏆 ACHIEVEMENT!", "gold");
     playSound('heal');
+    
+    const popup = document.getElementById('achievement-popup');
+    document.getElementById('ach-popup-name').innerText = i18nEngine[currentLang][id] || id;
+    popup.style.top = '20px';
+    setTimeout(() => { popup.style.top = '-100px'; }, 4000);
   }
 }
 
@@ -634,7 +662,7 @@ function pixelExplosion(pos, color) {
   }
 }
 
-// ✅ УЛУЧШЕННЫЙ ПАРСЕР (РАБОТАЕТ С ССЫЛКАМИ БЕЗ СКОБОК)
+// ✅ УЛУЧШЕННЫЙ ПАРСЕР И РЕЖИМ ВВОДА ТЕКСТА
 function openQuiz(eggMesh) {
   isQuizActive = true; currentEggMesh = eggMesh; document.exitPointerLock();
   const task = eggMesh.userData.task;
@@ -666,19 +694,43 @@ function openQuiz(eggMesh) {
   document.getElementById('quiz-q').innerText = qText;
 
   const ansBox = document.getElementById('quiz-answers'); ansBox.innerHTML = '';
-  let allAns = [...task.wrong, task.correct].sort(() => Math.random() - 0.5);
   
-  allAns.forEach(ans => {
-    const btn = document.createElement('button'); btn.className = 'ans-btn'; btn.innerText = ans;
-    btn.onclick = (e) => checkAnswer(e.target, ans, task.correct);
-    ansBox.appendChild(btn);
-  });
+  // Если нет вариантов неправильных ответов - делаем ввод с клавиатуры
+  if (!task.wrong || task.wrong.length === 0) {
+      const inp = document.createElement('input');
+      inp.type = 'text'; inp.placeholder = 'Введите ответ...';
+      inp.style.cssText = "width: 100%; box-sizing: border-box; padding: 15px; margin-bottom: 15px; font-size: 20px; font-family: 'Montserrat'; border-radius: 8px; border: 2px solid #55ffff; background: #000; color: #fff; text-align: center;";
+      
+      const btn = document.createElement('button'); 
+      btn.className = 'ans-btn'; 
+      btn.innerText = 'ОТВЕТИТЬ';
+      
+      btn.onclick = (e) => checkAnswer(btn, inp.value.trim(), task.correct.toString().trim());
+      inp.onkeydown = (e) => { if(e.key === 'Enter') btn.click(); };
+      
+      ansBox.appendChild(inp); 
+      ansBox.appendChild(btn);
+      setTimeout(() => inp.focus(), 100);
+  } else {
+      let allAns = [...task.wrong, task.correct].sort(() => Math.random() - 0.5);
+      allAns.forEach(ans => {
+        const btn = document.createElement('button'); btn.className = 'ans-btn'; btn.innerText = ans;
+        btn.onclick = (e) => checkAnswer(e.target, ans, task.correct);
+        ansBox.appendChild(btn);
+      });
+  }
   ui.style.display = 'block';
 }
 
 function checkAnswer(btnEl, selected, correct) {
-  document.querySelectorAll('.ans-btn').forEach(b => b.disabled = true);
-  if(selected === correct) {
+  document.querySelectorAll('.ans-btn, input').forEach(b => b.disabled = true);
+  
+  // Обработка строк для текстового поля (регистронезависимо)
+  let isCorrect = (typeof selected === 'string' && typeof correct === 'string') 
+                  ? selected.toLowerCase() === correct.toLowerCase() 
+                  : selected === correct;
+
+  if(isCorrect) {
     playSound('heal'); btnEl.classList.add('correct'); eggsFound++; score += 500; updateUI();
     unlockAch('ach1'); // Ачивка за первое яйцо
     pixelExplosion(currentEggMesh.position, currentEggMesh.userData.baseColor);
@@ -790,7 +842,7 @@ function animate() {
     else { if(currentWeaponType === 'gun') weaponGroup.position.z += Math.sin(swingProgress)*0.1; else weaponGroup.rotateX(-Math.sin(swingProgress)); }
   } else weaponGroup.rotateX(currentWeaponType !== 'gun' ? Math.PI/8 : 0);
 
-  // ✅ ЗАЯЦ: Исправленный вектор ориентации
+  // ЗАЯЦ
   if(rabbitObj) {
       rabbitObj.userData.timer -= delta;
       if(rabbitObj.userData.timer <= 0) {
@@ -801,7 +853,6 @@ function animate() {
       if(rabbitObj.position.y < 0) { rabbitObj.position.y = 0; rabbitObj.userData.vel.y = 0; rabbitObj.userData.vel.x *= 0.9; rabbitObj.userData.vel.z *= 0.9; }
       rabbitObj.position.x = Math.max(WORLD_MIN, Math.min(WORLD_MAX, rabbitObj.position.x)); rabbitObj.position.z = Math.max(WORLD_MIN, Math.min(WORLD_MAX, rabbitObj.position.z));
       
-      // Поворот кролика по вектору движения
       if (rabbitObj.userData.vel.x !== 0 || rabbitObj.userData.vel.z !== 0) {
          rabbitObj.rotation.y = Math.atan2(rabbitObj.userData.vel.x, rabbitObj.userData.vel.z);
       }
@@ -812,17 +863,31 @@ function animate() {
       else { rabbitObj.userData.parts.legBL.rotation.x = 0; rabbitObj.userData.parts.legBR.rotation.x = 0; }
   }
 
+  // ✅ ЛОГИКА МОБОВ, ИСПРАВЛЕНА ДЛЯ "ЛЕГКОГО РЕЖИМА" И ДОМОВ
   targets.forEach(t => {
     const mob = t.obj; const distToPlayer = mob.position.distanceTo(camera.position); const home = mob.userData.home || mob.position.clone();
-    if (distToPlayer > MOB_PLAYER_MAX_DIST) { const dirHome = home.clone().sub(mob.position); if (dirHome.length() > 0.001) { dirHome.normalize(); mob.position.add(dirHome.multiplyScalar(8 * delta)); } else { mob.position.copy(home); } }
+    
+    if (distToPlayer > MOB_PLAYER_MAX_DIST) { 
+        const dirHome = home.clone().sub(mob.position); 
+        if (dirHome.length() > 0.001) { dirHome.normalize(); mob.position.add(dirHome.multiplyScalar(8 * delta)); } else { mob.position.copy(home); } 
+    }
 
-    if (difficulty !== 'easy' && peaceTimer <= 0 && distToPlayer < 8) mob.userData.isAggro = true;
-    else if (peaceTimer > 0 || difficulty === 'easy') mob.userData.isAggro = false;
+    // Если игрок в доме - мобы сбрасывают агро
+    const isPlayerInHouse = checkHouseProtection(camera.position) !== null;
+    if (isPlayerInHouse) mob.userData.isAggro = false;
+
+    if (difficulty !== 'easy' && peaceTimer <= 0 && distToPlayer < 8 && !isPlayerInHouse) {
+        mob.userData.isAggro = true;
+    } else if (peaceTimer > 0) {
+        mob.userData.isAggro = false;
+    }
+
+    let moveSpeed = 0;
 
     if(mob.userData.isAggro && !isQuizActive) {
       mob.userData.aggroTimer -= delta; if (mob.userData.aggroTimer <= 0) mob.userData.isAggro = false;
       mob.lookAt(camera.position.x, 0, camera.position.z);
-      if(distToPlayer > 2.0) { mob.translateZ(6 * delta); } else {
+      if(distToPlayer > 2.0) { moveSpeed = 6 * delta; } else {
         if(Math.random() < 0.04) {
           health--; const hearts = document.querySelectorAll('.heart');
           for(let i=hearts.length-1; i>=0; i--) { if(!hearts[i].classList.contains('lost')) { hearts[i].classList.add('lost'); break; } }
@@ -831,16 +896,42 @@ function animate() {
         }
       }
     } else {
-      mob.userData.walkTimer -= delta;
-      if(mob.userData.walkTimer <= 0) {
-        mob.userData.walkTimer = Math.random() * 3 + 1; const toHome = home.clone().sub(mob.position); const dHome = toHome.length();
-        if (dHome > MOB_HOME_RADIUS) { mob.userData.walkDir = toHome.normalize(); } else { mob.userData.walkDir = new THREE.Vector3(Math.random()-0.5, 0, Math.random()-0.5).normalize(); }
+      if(!isQuizActive) {
+          if (difficulty === 'easy') {
+              // Мобы просто ходят по кругу в легком режиме
+              mob.rotation.y += delta;
+              moveSpeed = 1.5 * delta;
+          } else {
+              mob.userData.walkTimer -= delta;
+              if(mob.userData.walkTimer <= 0) {
+                mob.userData.walkTimer = Math.random() * 3 + 1; const toHome = home.clone().sub(mob.position); const dHome = toHome.length();
+                if (dHome > MOB_HOME_RADIUS) { mob.userData.walkDir = toHome.normalize(); } else { mob.userData.walkDir = new THREE.Vector3(Math.random()-0.5, 0, Math.random()-0.5).normalize(); }
+              }
+              mob.lookAt(mob.position.clone().add(mob.userData.walkDir));
+              moveSpeed = 1.5 * delta;
+          }
       }
-      if(!isQuizActive) { mob.lookAt(mob.position.clone().add(mob.userData.walkDir)); mob.translateZ(1.5 * delta); }
+    }
+
+    // Применяем движение с проверкой препятствий (Домов)
+    if (moveSpeed > 0) {
+        let nextPos = mob.position.clone();
+        nextPos.add(mob.getWorldDirection(new THREE.Vector3()).multiplyScalar(moveSpeed));
+        
+        // Моби не могут зайти в дом
+        if (!checkHouseProtection(nextPos)) {
+            mob.position.copy(nextPos);
+        } else {
+            // Если уперлись в дом и не в бою - разворачиваемся
+            if (!mob.userData.isAggro && difficulty !== 'easy') {
+                mob.userData.walkDir.negate();
+            }
+        }
     }
 
     mob.position.x = Math.max(WORLD_MIN + MOB_WORLD_CLAMP_MARGIN, Math.min(WORLD_MAX - MOB_WORLD_CLAMP_MARGIN, mob.position.x));
     mob.position.z = Math.max(WORLD_MIN + MOB_WORLD_CLAMP_MARGIN, Math.min(WORLD_MAX - MOB_WORLD_CLAMP_MARGIN, mob.position.z));
+    
     const p = mob.userData.parts; const w = Math.sin(now * (mob.userData.isAggro ? 15 : 5));
     if(mob.userData.type !== 'skeleton') { p.armL.rotation.x = w; p.armR.rotation.x = -w; } p.legL.rotation.x = -w; p.legR.rotation.x = w;
   });
