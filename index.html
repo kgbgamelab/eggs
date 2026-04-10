@@ -18,7 +18,6 @@
     .settings-panel { background: rgba(255,255,255,0.1); padding: 30px; border-radius: 20px; border: 2px solid #55ffff; width: 450px; text-align: center; }
     .settings-panel select { width: 100%; padding: 10px; margin-bottom: 20px; font-size: 18px; font-family: 'Montserrat'; border-radius: 8px; }
     .start-btn { background: #ffaa00; border: none; padding: 15px 40px; font-size: 24px; font-weight: bold; border-radius: 10px; cursor: pointer; transition: 0.2s; width: 100%; }
-    .start-btn:hover { background: #ff55ff; color: white; transform: scale(1.05); }
 
     #quiz-ui {
       display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -32,7 +31,6 @@
       display: block; width: 100%; padding: 12px; margin-bottom: 10px; font-size: 20px; font-family: 'Montserrat'; font-weight: bold;
       background: #000; color: #fff; border: 2px solid #ff55ff; border-radius: 8px; cursor: pointer; transition: 0.2s; white-space: normal; word-wrap: break-word;
     }
-    .ans-btn:hover { background: #ff55ff; color: #000; }
     .ans-btn.correct { background: #00ff00 !important; color: #000 !important; box-shadow: 0 0 20px #00ff00; }
     .ans-btn.wrong { background: #ff0000 !important; color: #fff !important; box-shadow: 0 0 20px #ff0000; }
 
@@ -58,7 +56,10 @@
     .crit { color: #ff3333; font-size: 60px; text-shadow: 4px 4px 0 #000; }
     @keyframes floatUp { to { transform: translateY(-150px) scale(1.3); opacity: 0; } }
 
+    /* ВЕРНУЛА ПРОПАВШИЙ БЛОК HOUSE-STATUS */
+    #house-status { position: absolute; top: 100px; width: 100%; text-align: center; font-size: 30px; color: #55ff55; text-shadow: 2px 2px 0 #000; display: none; }
     #peace-status { position: absolute; top: 140px; width: 100%; text-align: center; font-size: 30px; color: #55ffff; text-shadow: 2px 2px 0 #000; display: none; }
+
     #crosshair { position: absolute; top: 50%; left: 50%; width: 24px; height: 24px; transform: translate(-50%, -50%); mix-blend-mode: difference; }
     #crosshair::before { content: ''; position: absolute; top: 11px; left: 0; width: 24px; height: 2px; background: white; }
     #crosshair::after { content: ''; position: absolute; top: 0; left: 11px; width: 2px; height: 24px; background: white; }
@@ -77,7 +78,6 @@
     
     #damage-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: red; opacity: 0; pointer-events: none; transition: opacity 0.1s; }
     #game-over { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; color: white; z-index: 999; background: rgba(50,0,0,0.9); }
-    .btn-respawn { font-size: 40px; cursor: pointer; color: #ffff55; text-decoration: underline; margin-top: 20px; }
   </style>
 </head>
 <body>
@@ -101,7 +101,7 @@
   <div id="egg-counter">🥚 0 / 0</div>
   <div id="wood-counter">🪵 0</div>
   <div id="build-hint">3 (Дерево) + ПКМ = Строить Дом (10🪵)</div>
-  <div id="peace-status">🕊️ ПЕРЕМИРИЕ</div>
+  <div id="house-status">🛡️ В УКРЫТИИ</div> <div id="peace-status">🕊️ ПЕРЕМИРИЕ</div>
   <div id="crosshair"></div>
   <div id="bottom-ui">
     <div id="xp-info">
@@ -128,7 +128,7 @@
 </div>
 
 <div id="win-screen">
-  <h1 id="win-title">🏆 АЧИВКА: ВСЕ ЯЙЦА НАЙДЕНЫ!</h1>
+  <h1 id="win-title">🏆 ПОБЕДА!</h1>
   <div id="win-msg">Поздравление!</div>
   <div id="final-score">Score: 0</div>
   <div id="achievements-container"></div>
@@ -144,18 +144,17 @@
 <div id="game-over">
   <h1 style="font-size: 100px; margin:0; text-shadow: 5px 5px 0 #000; color: #ff5555;">YOU DIED</h1>
   <p class="btn-respawn" id="btn-respawn" onclick="location.reload()">Respawn</p>
-</div> 
-  <script>
-// --- МУЛЬТИЯЗЫЧНОСТЬ ДВИЖКА (С АЧИВКАМИ) ---
+</div>
+<script>
 const i18nEngine = {
-  ru: { title: "🐰 ОХОТА НА ЯЙЦА PRO 🐰", diffL: "Сложность:", dE: "Легко (Мобы мирные)", dN: "Средне (Мало мобов)", dH: "Сложно (Много мобов)", start: "НАЧАТЬ ИГРУ", build: "3 (Дерево) + ПКМ = Строить (10🪵). 4 = Топор", safe: "🛡️ В УКРЫТИИ", peace: "🕊️ ПЕРЕМИРИЕ", winT: "🏆 ПОБЕДА!", winB: "ИГРАТЬ СНОВА", rT: "🌟 ЛЕГЕНДАРНАЯ АЧИВКА! 🌟", rD: "ТЫ ПОЙМАЛ ПАСХАЛЬНОГО КРОЛИКА!", rB: "КРУТО!", resp: "Возродиться", score: "Счет:", ach1: "🥚 Первое яйцо", ach2: "🪓 Дровосек", ach3: "🎯 Снайпер", ach4: "🏠 Мастер-строитель", ach5: "🐇 Ловец кроликов", ach6: "🕊️ Мирный житель", ach7: "🏴‍☠️ Пират", ach8: "🥚 Счастливая Пасха!" },
-  en: { title: "🐰 EASTER EGG HUNT PRO 🐰", diffL: "Difficulty:", dE: "Easy (Peaceful)", dN: "Normal (Few mobs)", dH: "Hard (Many mobs)", start: "START GAME", build: "3 (Wood) + RMB = Build (10🪵). 4 = Axe", safe: "🛡️ SAFE ZONE", peace: "🕊️ PEACE", winT: "🏆 VICTORY!", winB: "PLAY AGAIN", rT: "🌟 LEGENDARY ACHIEVEMENT! 🌟", rD: "YOU CAUGHT THE EASTER BUNNY!", rB: "AWESOME!", resp: "Respawn", score: "Score:", ach1: "🥚 First Egg", ach2: "🪓 Woodcutter", ach3: "🎯 Sniper", ach4: "🏠 Master Builder", ach5: "🐇 Bunny Catcher", ach6: "🕊️ Pacifist", ach7: "🏴‍☠️ Pirate", ach8: "🥚 Happy Easter!" },
-  fr: { title: "🐰 CHASSE AUX OEUFS PRO 🐰", diffL: "Difficulté:", dE: "Facile (Pacifique)", dN: "Normal (Peu de monstres)", dH: "Difficile (Beaucoup de monstres)", start: "JOUER", build: "3 (Bois) + Clic Droit = Maison (10🪵). 4=Hache", safe: "🛡️ ZONE SÉCURISÉE", peace: "🕊️ PAIX", winT: "🏆 VICTOIRE!", winB: "REJOUER", rT: "🌟 SUCCÈS LÉGENDAIRE! 🌟", rD: "TU AS ATTRAPÉ LE LAPIN DE PÂQUES!", rB: "GÉNIAL!", resp: "Réapparaître", score: "Score final:", ach1: "🥚 Premier œuf", ach2: "🪓 Bûcheron", ach3: "🎯 Sniper", ach4: "🏠 Bâtisseur", ach5: "🐇 Chasseur de lapin", ach6: "🕊️ Pacifiste", ach7: "🏴‍☠️ Pirate", ach8: "🥚 Joyeuses Pâques!" },
-  de: { title: "🐰 OSTEREIERSUCHE PRO 🐰", diffL: "Schwierigkeit:", dE: "Leicht (Friedlich)", dN: "Normal (Wenige Mobs)", dH: "Schwer (Viele Mobs)", start: "START", build: "3 (Holz) + RMT = Haus bauen (10🪵). 4=Axt", safe: "🛡️ SICHERHEITSZONE", peace: "🕊️ FRIEDEN", winT: "🏆 SIEG!", winB: "NOCHMAL SPIELEN", rT: "🌟 LEGENDÄRER ERFOLG! 🌟", rD: "DU HAST DEN OSTERHASEN GEFANGEN!", rB: "GENIAL!", resp: "Wiederbeleben", score: "Punkte:", ach1: "🥚 Erstes Ei", ach2: "🪓 Holzfäller", ach3: "🎯 Scharfschütze", ach4: "🏠 Baumeister", ach5: "🐇 Hasenfänger", ach6: "🕊️ Pazifist", ach7: "🏴‍☠️ Pirat", ach8: "🥚 Frohe Ostern!" },
-  es: { title: "🐰 BÚSQUEDA DE HUEVOS PRO 🐰", diffL: "Dificultad:", dE: "Fácil (Pacífico)", dN: "Normal (Pocos mobs)", dH: "Difícil (Muchos mobs)", start: "EMPEZAR", build: "3 (Madera) + Click Der = Casa (10🪵). 4=Hacha", safe: "🛡️ ZONA SEGURA", peace: "🕊️ PAZ", winT: "🏆 ¡VICTORIA!", winB: "JUGAR DE NUEVO", rT: "🌟 ¡LOGRO LEGENDARIO! 🌟", rD: "¡ATRAPASTE AL CONEJO DE PASCUA!", rB: "¡GENIAL!", resp: "Reaparecer", score: "Puntuación:", ach1: "🥚 Primer Huevo", ach2: "🪓 Leñador", ach3: "🎯 Francotirador", ach4: "🏠 Constructor", ach5: "🐇 Cazador de conejos", ach6: "🕊️ Pacifista", ach7: "🏴‍☠️ Pirata", ach8: "🥚 ¡Felices Pascuas!" },
-  it: { title: "🐰 CACCIA ALLE UOVA PRO 🐰", diffL: "Difficoltà:", dE: "Facile (Pacifico)", dN: "Normale (Pochi mob)", dH: "Difficile (Molti mob)", start: "INIZIA GIOCO", build: "3 (Legno) + Tasto Destro = Casa (10🪵). 4=Ascia", safe: "🛡️ ZONA SICURA", peace: "🕊️ PACE", winT: "🏆 VITTORIA!", winB: "GIOCA ANCORA", rT: "🌟 OBIETTIVO LEGGENDARIO! 🌟", rD: "HAI PRESO IL CONIGLIO DI PASQUA!", rB: "FANTASTICO!", resp: "Rinasci", score: "Punteggio:", ach1: "🥚 Primo Uovo", ach2: "🪓 Taglialegna", ach3: "🎯 Cecchino", ach4: "🏠 Costruttore", ach5: "🐇 Cacciatore di conigli", ach6: "🕊️ Pacifista", ach7: "🏴‍☠️ Pirata", ach8: "🥚 Buona Pasqua!" },
-  ja: { title: "🐰 エッグハント PRO 🐰", diffL: "難易度:", dE: "簡単（平和）", dN: "普通（モブ少なめ）", dH: "難しい（モブ多い）", start: "ゲーム開始", build: "3 (木) + 右クリック = 家を建てる (10🪵). 4=斧", safe: "🛡️ 安全地帯", peace: "🕊️ 平和", winT: "🏆 勝利！", winB: "もう一度プレイ", rT: "🌟 伝説の実績！ 🌟", rD: "イースターバニーを捕まえた！", rB: "すごい！", resp: "リスポーン", score: "最終スコア:", ach1: "🥚 最初の卵", ach2: "🪓 木こり", ach3: "🎯 スナイパー", ach4: "🏠 建築家", ach5: "🐇 ウサギ捕り", ach6: "🕊️ 平和主義者", ach7: "🏴‍☠️ 海賊", ach8: "🥚 ハッピーイースター！" },
-  zh: { title: "🐰 寻找彩蛋 PRO 🐰", diffL: "难度:", dE: "简单（和平）", dN: "普通（少量怪物）", dH: "困难（大量怪物）", start: "开始游戏", build: "3 (木头) + 右键 = 建造房屋 (10🪵). 4=斧头", safe: "🛡️ 安全区", peace: "🕊️ 和平", winT: "🏆 胜利！", winB: "再玩一次", rT: "🌟 传奇成就！ 🌟", rD: "你抓住了复活节兔子！", rB: "太棒了！", resp: "重生", score: "最终得分:", ach1: "🥚 第一个蛋", ach2: "🪓 伐木工", ach3: "🎯 神枪手", ach4: "🏠 建筑师", ach5: "🐇 兔子猎人", ach6: "🕊️ 和平主义者", ach7: "🏴‍☠️ 海盗", ach8: "🥚 复活节快乐！" }
+  ru: { title: "🐰 ОХОТА НА ЯЙЦА PRO 🐰", diffL: "Сложность:", dE: "Легко (Мобы мирные)", dN: "Средне (Мало мобов)", dH: "Сложно (Много мобов)", start: "НАЧАТЬ ИГРУ", build: "3=Дерево+ПКМ (Дом). 4=Топор", safe: "🛡️ В УКРЫТИИ", peace: "🕊️ ПЕРЕМИРИЕ", winT: "🏆 ПОБЕДА!", winB: "ИГРАТЬ СНОВА", rT: "🌟 ЛЕГЕНДАРНАЯ АЧИВКА! 🌟", rD: "ТЫ ПОЙМАЛ ПАСХАЛЬНОГО КРОЛИКА!", rB: "КРУТО!", resp: "Возродиться", score: "Итоговый счет:", achWeapon: "⚔️ Оружейник", achBuild: "🏠 Строитель", achRabbit: "🐇 Пасхальный кролик", achPeace: "🕊️ Мирный житель", achPirate: "🏴‍☠️ Пират", achEaster: "🥚 Счастливая Пасха!" },
+  en: { title: "🐰 EASTER EGG HUNT PRO 🐰", diffL: "Difficulty:", dE: "Easy (Peaceful)", dN: "Normal (Few mobs)", dH: "Hard (Many mobs)", start: "START GAME", build: "3=Wood+RMB (House). 4=Axe", safe: "🛡️ SAFE ZONE", peace: "🕊️ PEACE", winT: "🏆 VICTORY!", winB: "PLAY AGAIN", rT: "🌟 LEGENDARY ACHIEVEMENT! 🌟", rD: "YOU CAUGHT THE EASTER BUNNY!", rB: "AWESOME!", resp: "Respawn", score: "Total Score:", achWeapon: "⚔️ Gunsmith", achBuild: "🏠 Builder", achRabbit: "🐇 Easter Bunny", achPeace: "🕊️ Pacifist", achPirate: "🏴‍☠️ Pirate", achEaster: "🥚 Happy Easter!" },
+  fr: { title: "🐰 CHASSE AUX OEUFS PRO 🐰", diffL: "Difficulté:", dE: "Facile (Pacifique)", dN: "Normal (Peu de monstres)", dH: "Difficile (Beaucoup)", start: "JOUER", build: "3=Bois+ClicD (Maison). 4=Hache", safe: "🛡️ ZONE SÉCURISÉE", peace: "🕊️ PAIX", winT: "🏆 VICTOIRE!", winB: "REJOUER", rT: "🌟 SUCCÈS LÉGENDAIRE! 🌟", rD: "TU AS ATTRAPÉ LE LAPIN!", rB: "GÉNIAL!", resp: "Réapparaître", score: "Score final:", achWeapon: "⚔️ Armurier", achBuild: "🏠 Bâtisseur", achRabbit: "🐇 Lapin de Pâques", achPeace: "🕊️ Pacifiste", achPirate: "🏴‍☠️ Pirate", achEaster: "🥚 Joyeuses Pâques!" },
+  de: { title: "🐰 OSTEREIERSUCHE PRO 🐰", diffL: "Schwierigkeit:", dE: "Leicht (Friedlich)", dN: "Normal (Wenige Mobs)", dH: "Schwer (Viele Mobs)", start: "START", build: "3=Holz+RMT (Haus). 4=Axt", safe: "🛡️ SICHERHEITSZONE", peace: "🕊️ FRIEDEN", winT: "🏆 SIEG!", winB: "NOCHMAL SPIELEN", rT: "🌟 LEGENDÄRER ERFOLG! 🌟", rD: "DU HAST DEN HASEN GEFANGEN!", rB: "GENIAL!", resp: "Wiederbeleben", score: "Gesamtpunkte:", achWeapon: "⚔️ Waffenschmied", achBuild: "🏠 Baumeister", achRabbit: "🐇 Osterhase", achPeace: "🕊️ Pazifist", achPirate: "🏴‍☠️ Pirat", achEaster: "🥚 Frohe Ostern!" },
+  es: { title: "🐰 BÚSQUEDA DE HUEVOS PRO 🐰", diffL: "Dificultad:", dE: "Fácil (Pacífico)", dN: "Normal (Pocos mobs)", dH: "Difícil (Muchos mobs)", start: "EMPEZAR", build: "3=Madera+ClickD (Casa). 4=Hacha", safe: "🛡️ ZONA SEGURA", peace: "🕊️ PAZ", winT: "🏆 ¡VICTORIA!", winB: "JUGAR DE NUEVO", rT: "🌟 ¡LOGRO LEGENDARIO! 🌟", rD: "¡ATRAPASTE AL CONEJO!", rB: "¡GENIAL!", resp: "Reaparecer", score: "Puntuación total:", achWeapon: "⚔️ Armero", achBuild: "🏠 Constructor", achRabbit: "🐇 Conejo de Pascua", achPeace: "🕊️ Pacifista", achPirate: "🏴‍☠️ Pirata", achEaster: "🥚 ¡Felices Pascuas!" },
+  it: { title: "🐰 CACCIA ALLE UOVA PRO 🐰", diffL: "Difficoltà:", dE: "Facile (Pacifico)", dN: "Normale (Pochi mob)", dH: "Difficile (Molti mob)", start: "INIZIA GIOCO", build: "3=Legno+Destro (Casa). 4=Ascia", safe: "🛡️ ZONA SICURA", peace: "🕊️ PACE", winT: "🏆 VITTORIA!", winB: "GIOCA ANCORA", rT: "🌟 OBIETTIVO LEGGENDARIO! 🌟", rD: "HAI PRESO IL CONIGLIO!", rB: "FANTASTICO!", resp: "Rinasci", score: "Punteggio finale:", achWeapon: "⚔️ Armaiolo", achBuild: "🏠 Costruttore", achRabbit: "🐇 Coniglietto di Pasqua", achPeace: "🕊️ Pacifista", achPirate: "🏴‍☠️ Pirata", achEaster: "🥚 Buona Pasqua!" },
+  ja: { title: "🐰 エッグハント PRO 🐰", diffL: "難易度:", dE: "簡単（平和）", dN: "普通（モブ少なめ）", dH: "難しい（モブ多い）", start: "ゲーム開始", build: "3=木+右クリック(家). 4=斧", safe: "🛡️ 安全地帯", peace: "🕊️ 平和", winT: "🏆 勝利！", winB: "もう一度プレイ", rT: "🌟 伝説の実績！ 🌟", rD: "バニーを捕まえた！", rB: "すごい！", resp: "リスポーン", score: "最終スコア:", achWeapon: "⚔️ ガンスミス", achBuild: "🏠 建築家", achRabbit: "🐇 イースターバニー", achPeace: "🕊️ 平和主義者", achPirate: "🏴‍☠️ 海賊", achEaster: "🥚 ハッピーイースター！" },
+  zh: { title: "🐰 寻找彩蛋 PRO 🐰", diffL: "难度:", dE: "简单（和平）", dN: "普通（少量怪物）", dH: "困难（大量怪物）", start: "开始游戏", build: "3=木头+右键(房屋). 4=斧头", safe: "🛡️ 安全区", peace: "🕊️ 和平", winT: "🏆 胜利！", winB: "再玩一次", rT: "🌟 传奇成就！ 🌟", rD: "你抓住了兔子！", rB: "太棒了！", resp: "重生", score: "最终得分:", achWeapon: "⚔️ 武器大师", achBuild: "🏠 建筑师", achRabbit: "🐇 复活节兔子", achPeace: "🕊️ 和平主义者", achPirate: "🏴‍☠️ 海盗", achEaster: "🥚 复活节快乐！" }
 };
 
 let currentLang = 'ru'; 
@@ -340,12 +339,12 @@ function init() {
     if(e.code === 'Space') move.jump = true; if(e.code === 'ShiftLeft') move.sprint = true;
     handleKeys(e.code, true);
   });
+  
   document.addEventListener('keyup', e => {
     if(e.code === 'Space') move.jump = false; if(e.code === 'ShiftLeft') move.sprint = false;
     handleKeys(e.code, false);
   });
   
-  // ✅ ОБРАБОТКА КЛИКОВ: ЛКМ - Атака/Рубка. ПКМ - Постройка.
   document.addEventListener('mousedown', (e) => {
     if(!gameStarted || isDead || isQuizActive) return;
     if (e.button === 2) { buildHouse(e); } 
@@ -362,10 +361,10 @@ function init() {
 // ✅ ПРАВИЛЬНЫЙ БЕЛЫЙ КРОЛИК ИЗ ПРИМИТИВОВ (Лицо по оси +Z)
 function spawnRabbit() {
   const grp = new THREE.Group();
-  const mat = new THREE.MeshLambertMaterial({color: 0xffffff}); // 100% БЕЛЫЙ
+  const mat = new THREE.MeshLambertMaterial({color: 0xffffff}); 
   
   const body = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.6), mat); body.position.y = 0.2;
-  const head = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), mat); head.position.set(0, 0.4, 0.35); // Голова впереди (+Z)
+  const head = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), mat); head.position.set(0, 0.4, 0.35); 
   
   const eyeL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.06), new THREE.MeshBasicMaterial({color: 0x000000})); eyeL.position.set(-0.1, 0.1, 0.16); head.add(eyeL);
   const eyeR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.06), new THREE.MeshBasicMaterial({color: 0x000000})); eyeR.position.set(0.1, 0.1, 0.16); head.add(eyeR);
@@ -374,7 +373,7 @@ function spawnRabbit() {
   const earL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.3, 0.06), mat); earL.position.set(-0.1, 0.3, 0); head.add(earL);
   const earR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.3, 0.06), mat); earR.position.set(0.1, 0.3, 0); head.add(earR);
   
-  const tail = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.15), mat); tail.position.set(0, 0.25, -0.35); // Хвост сзади (-Z)
+  const tail = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.15), mat); tail.position.set(0, 0.25, -0.35);
 
   const legFL = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.2, 0.1), mat); legFL.position.set(-0.15, 0.1, 0.2);
   const legFR = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.2, 0.1), mat); legFR.position.set(0.15, 0.1, 0.2);
@@ -384,30 +383,6 @@ function spawnRabbit() {
   grp.add(body, head, tail, legFL, legFR, legBL, legBR);
   grp.userData = { isRabbit: true, vel: new THREE.Vector3(), timer: 0, parts: {earL, earR, legBL, legBR} };
   grp.position.set(10, 0, 10); scene.add(grp); rabbitObj = grp;
-}
-
-function createMob() {
-  const mob = new THREE.Group();
-  const isSkel = Math.random() > 0.5;
-  const skinColor = isSkel ? 0xdddddd : 0x5D995D; const texFace = isSkel ? textures.skel_face : textures.face;
-  const matSkin = new THREE.MeshLambertMaterial({color: skinColor});
-  const matClothes = new THREE.MeshLambertMaterial({color: isSkel ? 0xcccccc : 0x3C50C4});
-  const headMats = [matSkin, matSkin, matSkin, matSkin, new THREE.MeshLambertMaterial({map: texFace}), matSkin];
-  
-  const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.75, 0.25), isSkel ? new THREE.MeshLambertMaterial({map: textures.skel_body}) : matClothes); body.position.y = 1.125;
-  const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), headMats); head.position.y = 1.75; head.userData.isHead = true; // ✅ ХЭДШОТ
-
-  const w = isSkel ? 0.1 : 0.2;
-  const armGeo = new THREE.BoxGeometry(w, 0.75, w); armGeo.translate(0, -0.3, 0);
-  const armL = new THREE.Mesh(armGeo, matSkin); armL.position.set(-0.35, 1.5, 0);
-  const armR = new THREE.Mesh(armGeo, matSkin); armR.position.set(0.35, 1.5, 0);
-  const legGeo = new THREE.BoxGeometry(w, 0.75, w); legGeo.translate(0, -0.375, 0);
-  const legL = new THREE.Mesh(legGeo, matSkin); legL.position.set(-0.15, 0.75, 0);
-  const legR = new THREE.Mesh(legGeo, matSkin); legR.position.set(0.15, 0.75, 0);
-
-  mob.add(body, head, armL, armR, legL, legR);
-  mob.userData = { parts: {armL, armR, legL, legR, body, head}, isAggro: false, aggroTimer: 0, type: isSkel ? 'skeleton' : 'zombie', hp: 3, walkTimer: Math.random() * 2, walkDir: new THREE.Vector3(Math.random()-0.5, 0, Math.random()-0.5).normalize(), home: null };
-  return mob;
 }
 
 function createHouse(x, y, z) {
@@ -424,19 +399,26 @@ function createHouse(x, y, z) {
   houses.push({ hp: 999, bounds: { minX: x - 3.8, maxX: x + 3.8, minZ: z - 3.8, maxZ: z + 3.8 } });
 }
 
-function generateEggTexture(baseColor) {
-  const c = document.createElement('canvas'); c.width=64; c.height=64; const ctx = c.getContext('2d');
-  ctx.fillStyle = baseColor.getStyle(); ctx.fillRect(0,0,64,64);
-  ctx.fillStyle = 'rgba(255,255,255,0.8)'; for(let i=0; i<8; i++) { ctx.beginPath(); ctx.arc(Math.random()*64, Math.random()*64, 3+Math.random()*4, 0, Math.PI*2); ctx.fill(); }
-  ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.fillRect(0, 15, 64, 5); ctx.fillRect(0, 45, 64, 5);
-  const tex = new THREE.CanvasTexture(c); tex.magFilter = THREE.NearestFilter; return tex;
+function createTree(x, z) {
+  const group = new THREE.Group(); group.userData = { isTree: true, hp: 3 };
+  const trunk = new THREE.Mesh(new THREE.BoxGeometry(1, 5, 1), new THREE.MeshLambertMaterial({map: textures.wood})); trunk.position.y = 2.5; trunk.castShadow = true;
+  const leafGeo = new THREE.BoxGeometry(1, 1, 1); const leafMat = new THREE.MeshLambertMaterial({map: textures.leaves, color: 0xFFB7C5});
+  for(let lx=-2; lx<=2; lx++) for(let ly=0; ly<=2; ly++) for(let lz=-2; lz<=2; lz++)
+    if(Math.abs(lx)+Math.abs(ly)+Math.abs(lz) < 4) { const l = new THREE.Mesh(leafGeo, leafMat); l.position.set(lx, 4+ly, lz); group.add(l); }
+  group.add(trunk); group.position.set(x, 0, z); scene.add(group);
 }
 
 function spawnEggs() {
   const geo = new THREE.SphereGeometry(0.6, 16, 16); geo.scale(1, 1.3, 1);
   levelData.eggs.forEach(task => {
     const color = new THREE.Color().setHSL(Math.random(), 1, 0.6);
-    const mat = new THREE.MeshStandardMaterial({map: generateEggTexture(color), roughness: 0.2, emissive: color, emissiveIntensity: 0.2});
+    const cCanvas = document.createElement('canvas'); cCanvas.width=64; cCanvas.height=64; const ctx = cCanvas.getContext('2d');
+    ctx.fillStyle = color.getStyle(); ctx.fillRect(0,0,64,64); ctx.fillStyle = 'rgba(255,255,255,0.8)'; 
+    for(let i=0; i<8; i++) { ctx.beginPath(); ctx.arc(Math.random()*64, Math.random()*64, 3+Math.random()*4, 0, Math.PI*2); ctx.fill(); }
+    ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.fillRect(0, 15, 64, 5); ctx.fillRect(0, 45, 64, 5);
+    const tex = new THREE.CanvasTexture(cCanvas); tex.magFilter = THREE.NearestFilter;
+    
+    const mat = new THREE.MeshStandardMaterial({map: tex, roughness: 0.2, emissive: color, emissiveIntensity: 0.2});
     const mesh = new THREE.Mesh(geo, mat); mesh.position.set(Math.random()*160-80, 0.7, Math.random()*160-80);
     mesh.userData = { isEgg: true, task: task, baseColor: color }; scene.add(mesh); eggs.push(mesh);
     const light = new THREE.PointLight(color, 1.5, 5); light.position.y = 1; mesh.add(light);
@@ -472,16 +454,16 @@ function setWeapon(type) {
 }
 
 function spawnLoot() {
-  for(let i=0; i<8; i++) { 
-      const b = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), new THREE.MeshLambertMaterial({color: 0xFFD700})); 
-      b.position.set(Math.random()*160-80, 0.4, Math.random()*160-80); b.userData = { type: 'chest' }; scene.add(b); bonuses.push(b); 
-  }
+  const chestGeo = new THREE.BoxGeometry(0.8, 0.8, 0.8); const chestMat = new THREE.MeshLambertMaterial({map: textures.chest});
+  for(let i=0; i<8; i++) { const b = new THREE.Mesh(chestGeo, chestMat); b.position.set(Math.random()*160-80, 0.4, Math.random()*160-80); b.userData = { type: 'chest' }; scene.add(b); bonuses.push(b); }
+  
   for(let i=0; i<3; i++) {
       const sword = new THREE.Group();
       const blade = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.8, 0.05), new THREE.MeshLambertMaterial({color: 0x88ccff})); const handle = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.3, 0.08), new THREE.MeshLambertMaterial({color: 0x5c4033}));
       blade.position.y=0.4; handle.position.y=-0.15; sword.add(blade, handle);
       sword.position.set(Math.random()*80-40, 0.5, Math.random()*80-40); sword.rotation.z = Math.PI/2; sword.userData = { type: 'sword_item' }; scene.add(sword); items.push(sword);
   }
+
   for(let i=0; i<3; i++) {
       const axe = new THREE.Group();
       const handle = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.6, 0.05), new THREE.MeshLambertMaterial({color: 0x5c4033})); handle.position.y = 0.2;
@@ -491,10 +473,34 @@ function spawnLoot() {
   }
 }
 
+function createMob() {
+  const mob = new THREE.Group();
+  const isSkel = Math.random() > 0.5;
+  const skinColor = isSkel ? 0xdddddd : 0x5D995D; const texFace = isSkel ? textures.skel_face : textures.face;
+  const matSkin = new THREE.MeshLambertMaterial({color: skinColor});
+  const matClothes = new THREE.MeshLambertMaterial({color: isSkel ? 0xcccccc : 0x3C50C4});
+  const headMats = [matSkin, matSkin, matSkin, matSkin, new THREE.MeshLambertMaterial({map: texFace}), matSkin];
+  
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.75, 0.25), isSkel ? new THREE.MeshLambertMaterial({map: textures.skel_body}) : matClothes); body.position.y = 1.125;
+  const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), headMats); head.position.y = 1.75; head.userData.isHead = true; // ✅ ХЭДШОТ
+
+  const w = isSkel ? 0.1 : 0.2;
+  const armGeo = new THREE.BoxGeometry(w, 0.75, w); armGeo.translate(0, -0.3, 0);
+  const armL = new THREE.Mesh(armGeo, matSkin); armL.position.set(-0.35, 1.5, 0);
+  const armR = new THREE.Mesh(armGeo, matSkin); armR.position.set(0.35, 1.5, 0);
+  const legGeo = new THREE.BoxGeometry(w, 0.75, w); legGeo.translate(0, -0.375, 0);
+  const legL = new THREE.Mesh(legGeo, matSkin); legL.position.set(-0.15, 0.75, 0);
+  const legR = new THREE.Mesh(legGeo, matSkin); legR.position.set(0.15, 0.75, 0);
+
+  mob.add(body, head, armL, armR, legL, legR);
+  mob.userData = { parts: {armL, armR, legL, legR, body, head}, isAggro: false, aggroTimer: 0, type: isSkel ? 'skeleton' : 'zombie', hp: 3, walkTimer: Math.random() * 2, walkDir: new THREE.Vector3(Math.random()-0.5, 0, Math.random()-0.5).normalize(), home: null };
+  return mob;
+}
+
 function unlockAch(id) {
   if(!myAchievements.has(id)) {
     myAchievements.add(id);
-    spawnFloatingText(camera.position.x, camera.position.y + 1, camera.position.z, i18nEngine[currentLang][id], "gold");
+    spawnFloatingText(camera.position.x, camera.position.y + 1, camera.position.z, "🏆 ACHIEVEMENT!", "gold");
     playSound('heal');
   }
 }
@@ -520,7 +526,7 @@ function checkGunsmith() {
     if(inventory.includes('sword') && inventory.includes('axe')) unlockAch('achWeapon');
 }
 
-// ✅ ПОСТРОЙКА ДОМА (РАБОТАЕТ ТОЛЬКО С ДЕРЕВОМ НА ПКМ)
+// ✅ ПОСТРОЙКА ДОМА 
 function buildHouse(e) {
   if(e) e.preventDefault();
   if(!gameStarted || isDead || isQuizActive || woodCount < 10 || currentWeaponType !== 'wood') return; 
@@ -582,8 +588,7 @@ function attack(e) {
         playSound('loot'); scene.remove(root); items = items.filter(i => i !== root); 
         if(root.userData.type === 'sword_item') { inventory.push('sword'); document.getElementById('slot-1').classList.add('owned'); } 
         if(root.userData.type === 'axe_item') { inventory.push('axe'); document.getElementById('slot-3').classList.add('owned'); } 
-        checkGunsmith();
-        return; 
+        checkGunsmith(); return; 
     }
 
     let mobGroup = hit; while(mobGroup.parent && mobGroup.type !== 'Scene' && !targets.find(t => t.obj === mobGroup)) { mobGroup = mobGroup.parent; }
@@ -607,30 +612,29 @@ function attack(e) {
   }
 }
 
-// ✅ ПАРСЕР КАРТИНОК ИЗ [URL] ИЛИ ПРОСТО ПО ССЫЛКЕ
+// ПАРСЕР КАРТИНОК
 function openQuiz(eggMesh) {
   isQuizActive = true; currentEggMesh = eggMesh; document.exitPointerLock();
   const task = eggMesh.userData.task;
   const ui = document.getElementById('quiz-ui'); const img = document.getElementById('quiz-img');
   
-  let qText = task.question;
-  let finalImgUrl = task.img || "";
+  let qText = task.question; let finalImgUrl = task.img || "";
 
   let imgMatch = qText.match(/\[(.*?)\]/);
   if(imgMatch) {
-      finalImgUrl = imgMatch[1];
-      qText = qText.replace(imgMatch[0], '').trim();
-  } else if (qText.startsWith("http")) { 
-      finalImgUrl = qText;
-      qText = "Вопрос:";
+      finalImgUrl = imgMatch[1]; qText = qText.replace(imgMatch[0], '').trim();
+  } else {
+      let httpMatch = qText.match(/(https?:\/\/[^\s]+)/);
+      if(httpMatch) {
+          finalImgUrl = httpMatch[0]; qText = qText.replace(httpMatch[0], '').trim();
+      }
   }
   
+  if(qText === "") qText = "Внимание на экран:";
+  
   if(finalImgUrl && finalImgUrl.trim() !== "") { 
-      img.src = finalImgUrl.trim(); 
-      img.style.display = 'inline-block'; 
-  } else { 
-      img.style.display = 'none'; 
-  }
+      img.src = finalImgUrl.trim(); img.style.display = 'inline-block'; 
+  } else { img.style.display = 'none'; }
   
   document.getElementById('quiz-q').innerText = qText;
 
@@ -649,7 +653,7 @@ function checkAnswer(btnEl, selected, correct) {
   document.querySelectorAll('.ans-btn').forEach(b => b.disabled = true);
   if(selected === correct) {
     playSound('heal'); btnEl.classList.add('correct'); eggsFound++; score += 500; updateUI();
-    unlockAch('ach1'); // Первое Яйцо
+    unlockAch('ach1'); // Ачивка Первое Яйцо
     pixelExplosion(currentEggMesh.position, currentEggMesh.userData.baseColor);
     scene.remove(currentEggMesh); eggs = eggs.filter(e => e !== currentEggMesh);
   } else { playSound('wrong'); btnEl.classList.add('wrong'); }
@@ -661,7 +665,6 @@ function checkAnswer(btnEl, selected, correct) {
   }, 1500);
 }
 
-// ✅ ФИНАЛЬНЫЙ ЭКРАН
 function finishGame() {
   document.exitPointerLock(); playSound('music');
   
@@ -673,10 +676,8 @@ function finishGame() {
   
   const list = document.getElementById('achievements-container'); list.innerHTML = '';
   myAchievements.forEach(id => {
-      const badge = document.createElement('div');
-      badge.className = 'ach-badge';
-      badge.innerText = i18nEngine[currentLang][id];
-      list.appendChild(badge);
+      const badge = document.createElement('div'); badge.className = 'ach-badge';
+      badge.innerText = i18nEngine[currentLang][id]; list.appendChild(badge);
   });
 
   document.getElementById('win-screen').style.display = 'flex';
@@ -693,6 +694,14 @@ function updateUI() {
 function checkHouseProtection(pos) {
   for(let h of houses) { if (h.bounds && pos.x > h.bounds.minX + 0.5 && pos.x < h.bounds.maxX - 0.5 && pos.z > h.bounds.minZ + 0.5 && pos.z < h.bounds.maxZ - 0.5) return h; }
   return null;
+}
+
+function spawnParticles(pos, color, isHeart = false) {
+  for(let i=0; i<10; i++) {
+    let p; if(isHeart) { const heart = new THREE.Sprite(new THREE.SpriteMaterial({map: heartTexture, color: 0xffffff})); heart.scale.set(0.5, 0.5, 1); p = heart; } 
+    else { p = new THREE.Mesh(new THREE.BoxGeometry(0.15,0.15,0.15), new THREE.MeshBasicMaterial({color: color})); }
+    p.position.copy(pos); scene.add(p); particles.push({m:p, v: new THREE.Vector3((Math.random()-.5)*0.5, Math.random()*0.5, (Math.random()-.5)*0.5)});
+  }
 }
 
 function handleKeys(code, state) { if(code === 'KeyW') move.fwd = state; if(code === 'KeyS') move.bwd = state; if(code === 'KeyA') move.left = state; if(code === 'KeyD') move.right = state; }
@@ -761,11 +770,7 @@ function animate() {
          rabbitObj.userData.vel.set((Math.random()-0.5)*25, 0, (Math.random()-0.5)*25);
       }
       rabbitObj.position.add(rabbitObj.userData.vel.clone().multiplyScalar(delta)); 
-      
-      // Поворот кролика лицом (+Z) к вектору движения
-      if(rabbitObj.userData.vel.lengthSq() > 0.1) {
-          rabbitObj.rotation.y = Math.atan2(rabbitObj.userData.vel.x, rabbitObj.userData.vel.z);
-      }
+      if(rabbitObj.userData.vel.lengthSq() > 0.1) { rabbitObj.rotation.y = Math.atan2(rabbitObj.userData.vel.x, rabbitObj.userData.vel.z); }
       
       rabbitObj.position.x = Math.max(WORLD_MIN, Math.min(WORLD_MAX, rabbitObj.position.x)); 
       rabbitObj.position.z = Math.max(WORLD_MIN, Math.min(WORLD_MAX, rabbitObj.position.z));
