@@ -135,6 +135,34 @@
 </div>
 
 <script>
+    // --- ЗАЩИТА ОТ ИНСТРУМЕНТОВ РАЗРАБОТЧИКА ---
+    
+    // 1. Блокировка правой кнопки мыши (кроме полей ввода и вывода)
+    document.addEventListener('contextmenu', function(e) {
+        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+        }
+    });
+
+    // 2. Блокировка горячих клавиш (F12, Ctrl+Shift+I/J/C, Ctrl+U)
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'F12' || e.keyCode === 123) {
+            e.preventDefault();
+        }
+        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
+            e.preventDefault();
+        }
+        if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) {
+            e.preventDefault();
+        }
+    });
+
+    // 3. Ловушка для дебаггера (крашит/замораживает открытые инструменты разработчика)
+    setInterval(function() {
+        (function() { return false; }['constructor']('debugger')());
+    }, 50);
+    // -------------------------------------------
+
     const i18nEditor = {
         ru: { title: "🐰 ОХОТА НА ЯЙЦА: РЕДАКТОР 🐰", endLbl: "ФИНАЛЬНОЕ ПОЗДРАВЛЕНИЕ:", endPl: "Текст победы...", qLbl: "Вопросы", qPl: "Каждая строка — один вопрос\n(Для картинки добавьте [http://ссылка.jpg] в текст)", cLbl: "Правильные ответы", cPl: "Каждая строка — ответ для вопроса слева", wLbl: "Неправильные ответы", wPl: "Опционально: неверные ответы через |\nНапример: cat | cap | map", stealLbl: "Брать неверные ответы из правильных других вопросов, если строка пустая", randLbl: "Рандомный порядок вопросов в игре", pubBtn: "ОПУБЛИКОВАТЬ КВЕСТ", copy: "СКОПИРУЙТЕ ЭТОТ КОД ДЛЯ ВСТАВКИ (IFRAME):" },
         en: { title: "🐰 EASTER EGG HUNT: EDITOR 🐰", endLbl: "FINAL CONGRATULATIONS:", endPl: "Victory text...", qLbl: "Questions", qPl: "Each line is one question\n(To add image use [http://link.jpg] in text)", cLbl: "Correct Answers", cPl: "Each line — answer for the question on the left", wLbl: "Wrong Answers", wPl: "Optional: wrong answers separated by |\nExample: cat | cap | map", stealLbl: "Take wrong answers from other correct ones if line is empty", randLbl: "Randomize question order in game", pubBtn: "PUBLISH QUEST", copy: "COPY THIS CODE TO EMBED (IFRAME):" },
