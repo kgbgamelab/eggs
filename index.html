@@ -16,53 +16,72 @@
       align-items: center; justify-content: center; z-index: 2000; color: white; font-family: 'Montserrat', sans-serif;
     }
     #start-screen h1 { font-family: 'VT323'; font-size: 80px; color: #ffaa00; margin-bottom: 10px; text-shadow: 4px 4px 0 #ff55ff; text-align: center; }
-    .settings-panel { background: rgba(255,255,255,0.1); padding: 30px; border-radius: 20px; border: 2px solid #55ffff; width: 450px; text-align: center; }
+    .settings-panel { background: rgba(255,255,255,0.1); padding: 30px; border-radius: 20px; border: 2px solid #55ffff; width: 400px; text-align: center; }
     .settings-panel select { width: 100%; padding: 10px; margin-bottom: 20px; font-size: 18px; font-family: 'Montserrat'; border-radius: 8px; }
     .start-btn { background: #ffaa00; border: none; padding: 15px 40px; font-size: 24px; font-weight: bold; border-radius: 10px; cursor: pointer; transition: 0.2s; width: 100%; }
     .start-btn:hover { background: #ff55ff; color: white; transform: scale(1.05); }
 
-    /* UI КВИЗА */
+    /* UI КВИЗА (Исправлено вылезание текста) */
     #quiz-ui {
       display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
       background: rgba(30, 10, 46, 0.98); border: 6px solid #ffaa00; padding: 40px;
       text-align: center; border-radius: 20px; box-shadow: 0 0 80px rgba(255, 170, 0, 0.6); 
       pointer-events: auto; z-index: 1000; width: 600px; max-width: 90%; color: white; font-family: 'Montserrat', sans-serif;
     }
-    #quiz-img { width: 100%; max-height: 250px; object-fit: contain; border-radius: 10px; display: none; margin-bottom: 20px; border: 2px solid #55ffff; }
-    #quiz-q { font-size: 24px; color: #55ffff; margin-bottom: 25px; font-weight: bold; word-wrap: break-word; overflow-wrap: break-word; white-space: pre-wrap; max-height: 200px; overflow-y: auto; width: 100%; }
+    #quiz-img { max-width: 100%; max-height: 250px; object-fit: contain; border-radius: 10px; display: none; margin-bottom: 20px; border: 2px solid #55ffff; }
+    #quiz-q { 
+      font-size: 24px; color: #55ffff; margin-bottom: 25px; font-weight: bold; 
+      word-wrap: break-word; overflow-wrap: break-word; white-space: pre-wrap; 
+      max-height: 200px; overflow-y: auto; width: 100%; 
+    }
     .ans-btn {
-      display: block; width: 100%; padding: 12px; margin-bottom: 10px; font-size: 20px; font-family: 'Montserrat'; font-weight: bold;
-      background: #000; color: #fff; border: 2px solid #ff55ff; border-radius: 8px; cursor: pointer; transition: 0.2s; white-space: normal; word-wrap: break-word;
+      display: block; width: 100%; padding: 15px; margin-bottom: 10px; font-size: 20px; font-family: 'Montserrat'; font-weight: bold;
+      background: #000; color: #fff; border: 2px solid #ff55ff; border-radius: 8px; cursor: pointer; transition: 0.2s;
+      white-space: normal; word-wrap: break-word;
     }
     .ans-btn:hover { background: #ff55ff; color: #000; }
-    .ans-btn.correct { background: #00ff00 !important; color: #000 !important; box-shadow: 0 0 20px #00ff00; }
-    .ans-btn.wrong { background: #ff0000 !important; color: #fff !important; box-shadow: 0 0 20px #ff0000; }
+    .ans-btn.correct { background: #00ff00 !important; color: #000 !important; border-color: #00ff00 !important; box-shadow: 0 0 20px #00ff00; }
+    .ans-btn.wrong { background: #ff0000 !important; color: #fff !important; border-color: #ff0000 !important; box-shadow: 0 0 20px #ff0000; }
 
     #egg-counter { position: absolute; top: 20px; right: 30px; font-size: 50px; color: #fff; text-shadow: 4px 4px 0 #ffaa00; }
     #wood-counter { position: absolute; top: 80px; right: 30px; font-size: 40px; color: #fff; text-shadow: 3px 3px 0 #8B4513; }
-    #build-hint { position: absolute; top: 130px; right: 30px; font-size: 20px; color: #fff; font-family: 'Montserrat'; text-shadow: 2px 2px 0 #000; text-align: right;}
+    #build-hint { position: absolute; top: 130px; right: 30px; font-size: 20px; color: #fff; font-family: 'Montserrat'; text-shadow: 2px 2px 0 #000; }
 
-    /* ФИНАЛЬНЫЙ ЭКРАН */
+    /* ФИНАЛЬНЫЙ ЭКРАН С ОЧКАМИ И АЧИВКАМИ */
     #win-screen { 
       display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
       flex-direction: column; align-items: center; justify-content: center; 
       background: rgba(10, 5, 16, 0.95); z-index: 1001; pointer-events: auto; text-align: center;
     }
-    #win-title { font-size: 70px; color: #ffaa00; text-shadow: 5px 5px 0 #ff00ff; margin: 0; font-family: 'VT323'; }
+    #win-title { font-size: 80px; color: #ffaa00; text-shadow: 5px 5px 0 #ff00ff; margin: 0; font-family: 'VT323'; }
     #win-msg { font-size: 30px; color: #55ffff; margin-top: 10px; font-family: 'Montserrat'; font-weight: bold; }
     #final-score { font-size: 50px; color: #00ff00; font-family: 'VT323'; margin: 20px 0; text-shadow: 2px 2px 0 #000; }
     
-    #achievements-container { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; max-width: 800px; margin-bottom: 40px; }
-    .ach-badge { background: linear-gradient(45deg, #ffd700, #ffaa00); color: #000; padding: 10px 20px; border-radius: 20px; font-weight: bold; font-family: 'Montserrat'; font-size: 16px; box-shadow: 0 0 15px gold; border: 2px solid #fff; }
+    #achievements-container {
+      display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; max-width: 800px; margin-bottom: 40px;
+    }
+    .ach-badge {
+      background: linear-gradient(45deg, #ffd700, #ffaa00); color: #000; padding: 10px 20px;
+      border-radius: 20px; font-family: 'Montserrat'; font-weight: bold; font-size: 16px;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); border: 2px solid #fff;
+    }
 
-    #rabbit-screen { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; background: rgba(255, 215, 0, 0.9); z-index: 1002; pointer-events: auto; text-align: center; }
+    #rabbit-screen { 
+      display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+      flex-direction: column; align-items: center; justify-content: center; 
+      background: rgba(255, 215, 0, 0.9); z-index: 1002; pointer-events: auto; text-align: center;
+    }
 
-    .float-text { position: absolute; color: #ffff55; font-size: 40px; font-weight: bold; text-shadow: 3px 3px 0 #000; pointer-events: none; animation: floatUp 1.5s forwards; z-index: 500; }
+    .float-text {
+      position: absolute; color: #ffff55; font-size: 40px; font-weight: bold;
+      text-shadow: 3px 3px 0 #000; pointer-events: none;
+      animation: floatUp 1s forwards; z-index: 500;
+    }
     .crit { color: #ff3333; font-size: 60px; text-shadow: 4px 4px 0 #000; }
-    @keyframes floatUp { to { transform: translateY(-150px) scale(1.3); opacity: 0; } }
+    @keyframes floatUp { to { transform: translateY(-120px) scale(1.2); opacity: 0; } }
 
-    #peace-status { position: absolute; top: 140px; width: 100%; text-align: center; font-size: 30px; color: #55ffff; text-shadow: 2px 2px 0 #000; display: none; }
     #house-status { position: absolute; top: 100px; width: 100%; text-align: center; font-size: 30px; color: #55ff55; text-shadow: 2px 2px 0 #000; display: none; }
+    #peace-status { position: absolute; top: 140px; width: 100%; text-align: center; font-size: 30px; color: #55ffff; text-shadow: 2px 2px 0 #000; display: none; }
     #crosshair { position: absolute; top: 50%; left: 50%; width: 24px; height: 24px; transform: translate(-50%, -50%); mix-blend-mode: difference; }
     #crosshair::before { content: ''; position: absolute; top: 11px; left: 0; width: 24px; height: 2px; background: white; }
     #crosshair::after { content: ''; position: absolute; top: 0; left: 11px; width: 2px; height: 24px; background: white; }
@@ -74,6 +93,8 @@
 
     #xp-bar { width: 100%; height: 16px; background: #222; border: 3px solid #000; position: relative; margin-bottom: 10px; }
     #xp-fill { height: 100%; background: linear-gradient(to right, #00ff00, #55ff55); width: 0%; transition: width 0.2s; }
+    #xp-info { position: absolute; top: -35px; width: 100%; color: #80ff00; font-size: 30px; text-shadow: 2px 2px 0 #000; display: flex; justify-content: space-around; }
+
     #hotbar { display: flex; justify-content: center; gap: 4px; background: rgba(0,0,0,0.6); padding: 5px; border: 2px solid #fff; border-radius: 4px; }
     .slot { width: 60px; height: 60px; background: #8b8b8b; border: 4px solid #373737; border-top-color: #ddd; border-left-color: #ddd; display: flex; align-items: center; justify-content: center; font-size: 30px; color: white; opacity: 0.3; transition: 0.2s; }
     .slot.owned { opacity: 1; }
@@ -81,6 +102,7 @@
     
     #damage-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: red; opacity: 0; pointer-events: none; transition: opacity 0.1s; }
     #game-over { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; color: white; z-index: 999; background: rgba(50,0,0,0.9); }
+    .btn-respawn { font-size: 40px; cursor: pointer; color: #ffff55; text-decoration: underline; margin-top: 20px; }
   </style>
 </head>
 <body>
@@ -132,7 +154,7 @@
 </div>
 
 <div id="win-screen">
-  <h1 id="win-title">🏆 АЧИВКА: ВСЕ ЯЙЦА НАЙДЕНЫ!</h1>
+  <h1 id="win-title">🏆 ПОБЕДА!</h1>
   <div id="win-msg">Поздравление!</div>
   <div id="final-score">Score: 0</div>
   <div id="achievements-container"></div>
@@ -151,7 +173,6 @@
 </div>
 
 <script>
-// --- МУЛЬТИЯЗЫЧНОСТЬ ДВИЖКА (С АЧИВКАМИ) ---
 const i18nEngine = {
   ru: { title: "🐰 ОХОТА НА ЯЙЦА PRO 🐰", diffL: "Сложность:", dE: "Легко (Мобы мирные)", dN: "Средне (Мало мобов)", dH: "Сложно (Много мобов)", start: "НАЧАТЬ ИГРУ", build: "3 (Дерево) + ПКМ = Строить дом (10🪵). 4 = Топор", safe: "🛡️ В УКРЫТИИ", peace: "🕊️ ПЕРЕМИРИЕ", winT: "🏆 ПОБЕДА!", winB: "ИГРАТЬ СНОВА", rT: "🌟 ЛЕГЕНДАРНАЯ АЧИВКА! 🌟", rD: "ТЫ ПОЙМАЛ ПАСХАЛЬНОГО КРОЛИКА!", rB: "КРУТО!", resp: "Возродиться", score: "Итоговый счет:", achWeapon: "⚔️ Оружейник", achBuild: "🏠 Строитель", achRabbit: "🐇 Пасхальный кролик", achPeace: "🕊️ Мирный житель", achPirate: "🏴‍☠️ Пират", achEaster: "🥚 Счастливая Пасха!" },
   en: { title: "🐰 EASTER EGG HUNT PRO 🐰", diffL: "Difficulty:", dE: "Easy (Peaceful)", dN: "Normal (Few mobs)", dH: "Hard (Many mobs)", start: "START GAME", build: "3 (Wood) + RMB = Build House (10🪵). 4 = Axe", safe: "🛡️ SAFE ZONE", peace: "🕊️ PEACE", winT: "🏆 VICTORY!", winB: "PLAY AGAIN", rT: "🌟 LEGENDARY ACHIEVEMENT! 🌟", rD: "YOU CAUGHT THE EASTER BUNNY!", rB: "AWESOME!", resp: "Respawn", score: "Total Score:", achWeapon: "⚔️ Gunsmith", achBuild: "🏠 Builder", achRabbit: "🐇 Easter Bunny", achPeace: "🕊️ Pacifist", achPirate: "🏴‍☠️ Pirate", achEaster: "🥚 Happy Easter!" },
@@ -176,6 +197,7 @@ function setGameLanguage(lang) {
       document.getElementById('diff-hard').innerText = t.dH;
       document.getElementById('start-game-btn').innerText = t.start;
       document.getElementById('build-hint').innerText = t.build;
+      document.getElementById('house-status').innerText = t.safe;
       document.getElementById('win-title').innerText = t.winT;
       document.getElementById('btn-restart-win').innerText = t.winB;
       document.getElementById('rab-title').innerText = t.rT;
@@ -197,7 +219,6 @@ let currentWeaponType = 'gun';
 let inventory = ['gun', 'wood']; 
 let peaceTimer = 10.0; 
 let rabbitObj = null;
-
 let myAchievements = new Set();
 let textures = {}; 
 
@@ -336,10 +357,12 @@ function init() {
 
   document.addEventListener('keydown', e => {
     if(!gameStarted || isDead || isQuizActive) return;
+    
     if(e.key === '1') setWeapon('gun');
     if(e.key === '2' && inventory.includes('sword')) setWeapon('sword');
     if(e.key === '3') setWeapon('wood');
     if(e.key === '4' && inventory.includes('axe')) setWeapon('axe');
+    
     if(e.code === 'Space') move.jump = true; if(e.code === 'ShiftLeft') move.sprint = true;
     handleKeys(e.code, true);
   });
@@ -355,8 +378,7 @@ function init() {
     else if (e.button === 0) { attack(e); } 
   });
   
-  document.addEventListener('contextmenu', e => { e.preventDefault(); buildHouse(e); });
-  
+  document.addEventListener('contextmenu', e => { e.preventDefault(); });
   document.addEventListener('mousemove', e => {
     if(document.pointerLockElement) { yaw -= e.movementX*0.003; pitch -= e.movementY*0.003; pitch = Math.max(-1.5, Math.min(1.5, pitch)); camera.rotation.set(pitch, yaw, 0); }
   });
@@ -368,7 +390,7 @@ function spawnRabbit() {
   const mat = new THREE.MeshLambertMaterial({color: 0xffffff}); 
   
   const body = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.6), mat); body.position.y = 0.2;
-  const head = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), mat); head.position.set(0, 0.4, 0.35); // Голова впереди (+Z)
+  const head = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), mat); head.position.set(0, 0.4, 0.35); // Голова на +Z
   
   const eyeL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.06), new THREE.MeshBasicMaterial({color: 0x000000})); eyeL.position.set(-0.1, 0.1, 0.16); head.add(eyeL);
   const eyeR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.06), new THREE.MeshBasicMaterial({color: 0x000000})); eyeR.position.set(0.1, 0.1, 0.16); head.add(eyeR);
@@ -398,7 +420,7 @@ function createMob() {
   const headMats = [matSkin, matSkin, matSkin, matSkin, new THREE.MeshLambertMaterial({map: texFace}), matSkin];
   
   const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.75, 0.25), isSkel ? new THREE.MeshLambertMaterial({map: textures.skel_body}) : matClothes); body.position.y = 1.125;
-  const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), headMats); head.position.y = 1.75; head.userData.isHead = true; // ✅ ХЭДШОТ
+  const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), headMats); head.position.y = 1.75; head.userData.isHead = true; 
 
   const w = isSkel ? 0.1 : 0.2;
   const armGeo = new THREE.BoxGeometry(w, 0.75, w); armGeo.translate(0, -0.3, 0);
@@ -447,6 +469,7 @@ function spawnEggs() {
 }
 
 function setWeapon(type) {
+  if (!inventory.includes(type)) return;
   currentWeaponType = type; weaponGroup.clear(); 
   document.querySelectorAll('.slot').forEach((s, i) => {
       s.classList.remove('active');
@@ -519,10 +542,6 @@ function healPlayer() {
   }
 }
 
-function checkGunsmith() {
-    if(inventory.includes('sword') && inventory.includes('axe')) unlockAch('achWeapon');
-}
-
 function buildHouse(e) {
   if(e) e.preventDefault();
   if(!gameStarted || isDead || isQuizActive || woodCount < 10 || currentWeaponType !== 'wood') return; 
@@ -533,7 +552,7 @@ function buildHouse(e) {
   createHouse(spawnPos.x, spawnPos.y, spawnPos.z);
   woodCount -= 10; builtBlocks++; updateUI(); playSound('step');
   
-  if(builtBlocks >= 1) unlockAch('achBuild'); 
+  if(builtBlocks >= 1) unlockAch('ach4'); 
 }
 
 function attack(e) {
@@ -567,7 +586,7 @@ function attack(e) {
     }
     
     if (root.userData.isRabbit) { 
-        playSound('music'); scene.remove(root); rabbitObj = null; unlockAch('achRabbit'); 
+        playSound('music'); scene.remove(root); rabbitObj = null; unlockAch('ach5'); 
         document.exitPointerLock(); document.getElementById('rabbit-screen').style.display = 'flex'; return; 
     }
     
@@ -576,7 +595,7 @@ function attack(e) {
       chestsOpened++;
       if (Math.random() > 0.5) { healPlayer(); spawnFloatingText(root.position.x, root.position.y, root.position.z, "+1 ❤️", "#ff0000"); }
       else { score += 200; spawnFloatingText(root.position.x, root.position.y, root.position.z, "+200 XP", "#ffff00"); }
-      if(chestsOpened >= 8) unlockAch('achPirate'); 
+      if(chestsOpened >= 8) unlockAch('ach7'); 
       updateUI(); spawnParticles(root.position, 0xffff00); return; 
     }
     
@@ -584,7 +603,8 @@ function attack(e) {
         playSound('loot'); scene.remove(root); items = items.filter(i => i !== root); 
         if(root.userData.type === 'sword_item') { inventory.push('sword'); document.getElementById('slot-1').classList.add('owned'); } 
         if(root.userData.type === 'axe_item') { inventory.push('axe'); document.getElementById('slot-3').classList.add('owned'); } 
-        checkGunsmith(); return; 
+        if(inventory.includes('sword') && inventory.includes('axe')) unlockAch('achWeapon');
+        return; 
     }
 
     let mobGroup = hit; while(mobGroup.parent && mobGroup.type !== 'Scene' && !targets.find(t => t.obj === mobGroup)) { mobGroup = mobGroup.parent; }
@@ -605,6 +625,14 @@ function attack(e) {
         scene.remove(target.obj); targets = targets.filter(t => t !== target); score += 100; updateUI();
       } else { hit.material.color.setHex(0xff0000); setTimeout(() => hit.material.color.setHex(isHeadshot ? 0xdddddd : 0x5D995D), 200); }
     }
+  }
+}
+
+function pixelExplosion(pos, color) {
+  for(let i=0; i<40; i++) {
+    const p = new THREE.Mesh(new THREE.BoxGeometry(0.2,0.2,0.2), new THREE.MeshBasicMaterial({color: color}));
+    p.position.copy(pos); p.position.y += Math.random(); scene.add(p);
+    particles.push({m:p, v: new THREE.Vector3((Math.random()-.5)*0.5, Math.random()*0.3, (Math.random()-.5)*0.5)});
   }
 }
 
@@ -661,8 +689,8 @@ function checkAnswer(btnEl, selected, correct) {
 function finishGame() {
   document.exitPointerLock(); playSound('music');
   
-  unlockAch('achEaster'); 
-  if (hitMobsCount === 0) unlockAch('achPeace'); 
+  unlockAch('ach8'); 
+  if (hitMobsCount === 0) unlockAch('ach6'); 
   
   document.getElementById('win-msg').innerText = levelData.endMessage || (i18nEngine[currentLang] ? i18nEngine[currentLang].winT : "С Праздником!");
   document.getElementById('final-score').innerText = `${i18nEngine[currentLang].score} ${score}`;
